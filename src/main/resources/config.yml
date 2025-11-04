@@ -42,6 +42,7 @@ console-colors:
 # --------------------------------------------------------------------------------------
 message-prefixes:
   info: "<white> <#77DD77>"
-  notify: "<white> <#FFFACD>"
+  notification: "<white> <#FFFACD>"
   warning: "<white> <#FFD580>"
   severe: "<white> <#FF6961>"
+  broadcast: "<white> <gradient:#EBD197:#B48811>"

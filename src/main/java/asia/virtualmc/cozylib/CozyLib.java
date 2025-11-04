@@ -13,6 +13,7 @@ public final class CozyLib extends JavaPlugin {
     public void onEnable() {
         plugin = this;
         CommandAPI.onEnable();
+        new Config();
         this.registry = new Registry(this);
     }
 
