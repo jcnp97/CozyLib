@@ -14,7 +14,7 @@ public final class CozyLib extends JavaPlugin {
         plugin = this;
         CommandAPI.onEnable();
         new Config();
-        this.registry = new Registry(this);
+        //this.registry = new Registry(this);
     }
 
     @Override

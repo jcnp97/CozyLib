@@ -1,5 +1,6 @@
 package asia.virtualmc.cozylib.utilities.bukkit.messages;
 
+import asia.virtualmc.cozylib.Enums;
 import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;

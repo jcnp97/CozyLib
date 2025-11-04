@@ -1,5 +1,7 @@
 package asia.virtualmc.cozylib.utilities.bukkit.messages;
 
+import asia.virtualmc.cozylib.Config;
+import asia.virtualmc.cozylib.Enums;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import org.bukkit.Bukkit;
@@ -9,73 +11,60 @@ import org.jetbrains.annotations.NotNull;
 public class MessageUtils {
 
     /**
-     * Sends a color-coded message to a specified player based on the message type.
+     * Sends a formatted message to a specific player with a prefix based on the message type.
      * <p>
-     * The message will include a prefix glyph and color formatting depending on
-     * whether the message type is {@code GREEN}, {@code RED}, or {@code YELLOW}.
+     * The prefix is determined from the {@link Config.MessagePrefixes} configuration
+     * using the {@link #getColor(Enums.MessageType)} method. The message is only sent
+     * if the player is currently online.
      * </p>
      *
-     * @param player  the player to send the message to (must be online)
-     * @param message the message content to send
-     * @param type    the message type determining the color and prefix glyph
+     * @param player  the player to receive the message
+     * @param message the message text to send
+     * @param type    the type of message (INFO, WARNING, SEVERE, or NOTIFY)
      */
-    public static void sendMessage(@NotNull Player player, String message, EnumsLib.MessageType type) {
+    public static void sendMessage(@NotNull Player player, String message, Enums.MessageType type) {
         if (player.isOnline()) {
-            switch (type) {
-                case GREEN -> {
-                    player.sendMessage(AdventureUtils.toComponent(GlyphsConfig.get(EnumsLib.Glyphs.MSG_SUCCESS) +
-                            " <#6EFFB2>" + message));
-                }
-                case RED -> {
-                    player.sendMessage(AdventureUtils.toComponent(GlyphsConfig.get(EnumsLib.Glyphs.MSG_FAIL) +
-                            " <#FF6262>" + message));
-                }
-                case YELLOW -> {
-                    player.sendMessage(AdventureUtils.toComponent(GlyphsConfig.get(EnumsLib.Glyphs.MSG_NOTIFY) +
-                            " <#FCD05C>" + message));
-                }
-            }
+            player.sendMessage(AdventureUtils.toComponent(getColor(type) + " " + message));
         }
     }
 
     /**
-     * Broadcasts a message to all players on the server using a default broadcast format.
+     * Broadcasts a message to all players and the console using the default broadcast prefix.
      * <p>
-     * The broadcast includes a broadcast glyph and a gold gradient color scheme.
+     * This method delegates to {@link #sendBroadcast(String, Enums.MessageType)} with {@code null}
+     * as the message type, resulting in the use of the broadcast prefix from configuration.
      * </p>
      *
-     * @param message the message to broadcast to all players
+     * @param message the message text to broadcast
      */
     public static void sendBroadcast(String message) {
-        Bukkit.getServer().sendMessage(AdventureUtils.toComponent(GlyphsConfig.get(EnumsLib.Glyphs.MSG_BROADCAST) +
-                " <gradient:#ebd197:#b48811>" + message));
+        sendBroadcast(message, null);
     }
 
     /**
-     * Broadcasts a message to all players on the server using a color-coded message type.
+     * Broadcasts a message to all players and the console with an optional message type prefix.
      * <p>
-     * The broadcast will use a glyph and color corresponding to the specified message type
-     * ({@code GREEN}, {@code YELLOW}, or {@code RED}).
+     * If a message type is provided, the prefix is determined from
+     * {@link #getColor(Enums.MessageType)}. If {@code type} is {@code null},
+     * the broadcast prefix defined in {@link Config.MessagePrefixes} is used instead.
      * </p>
      *
-     * @param message the message to broadcast to all players
-     * @param type    the message type determining the color and prefix glyph
+     * @param message the message text to broadcast
+     * @param type    the message type to determine the prefix, or {@code null} to use the default broadcast prefix
      */
-    public static void sendBroadcast(String message, EnumsLib.MessageType type) {
-        switch (type) {
-            case GREEN -> Bukkit.getServer().sendMessage(AdventureUtils
-                    .toComponent(GlyphsConfig.get(EnumsLib.Glyphs.MSG_SUCCESS) + " <#6EFFB2>" + message));
-            case YELLOW -> Bukkit.getServer().sendMessage(AdventureUtils
-                    .toComponent(GlyphsConfig.get(EnumsLib.Glyphs.MSG_NOTIFY) + " <#FCD05C>" + message));
-            case RED -> Bukkit.getServer().sendMessage(AdventureUtils
-                    .toComponent(GlyphsConfig.get(EnumsLib.Glyphs.MSG_FAIL) + " <#FF6262>" + message));
+    public static void sendBroadcast(String message, Enums.MessageType type) {
+        if (type != null) {
+            Bukkit.getServer().sendMessage(AdventureUtils.toComponent(getColor(type) + " " + message));
+        } else {
+            Bukkit.getServer().sendMessage(AdventureUtils.toComponent(Config.getMessagePrefixes().broadcast() +
+                    " " + message));
         }
     }
 
     /**
      * Sends an interactive message to a player that, when clicked, suggests a command in chat.
      * <p>
-     * The message is formatted in green and can be clicked to auto-fill a specified command
+     * The message is formatted in green and can be clicked to automatically fill a specified command
      * into the player’s chat input.
      * </p>
      *
@@ -89,11 +78,23 @@ public class MessageUtils {
         player.sendMessage(first);
     }
 
-    public static String getColor(EnumsLib.MessageType type) {
+    /**
+     * Retrieves the appropriate message prefix color based on the specified message type.
+     * <p>
+     * The returned value corresponds to one of the configured message prefixes defined
+     * in {@link Config.MessagePrefixes}.
+     * </p>
+     *
+     * @param type the type of message (INFO, WARNING, SEVERE, or NOTIFY)
+     * @return the formatted prefix string associated with the given message type
+     */
+    public static String getColor(Enums.MessageType type) {
+        Config.MessagePrefixes prefix = Config.getMessagePrefixes();
         return switch (type) {
-            case GREEN -> GlyphsConfig.get(EnumsLib.Glyphs.MSG_SUCCESS) + " <#6EFFB2>";
-            case YELLOW -> GlyphsConfig.get(EnumsLib.Glyphs.MSG_NOTIFY) + " <#FCD05C>";
-            case RED -> GlyphsConfig.get(EnumsLib.Glyphs.MSG_FAIL) + " <#FF6262>";
+            case INFO -> prefix.info();
+            case WARNING -> prefix.warning();
+            case SEVERE -> prefix.severe();
+            case NOTIFY -> prefix.notification();
         };
     }
 }
