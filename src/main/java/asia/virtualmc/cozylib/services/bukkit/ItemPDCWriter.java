@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class PDCWriter {
+public class ItemPDCWriter {
 
     // Todo: Add pdc maps
     public record PDCConfig(

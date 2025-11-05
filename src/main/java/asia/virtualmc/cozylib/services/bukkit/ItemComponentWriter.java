@@ -16,7 +16,7 @@ import java.util.List;
  * Utility service for building and modifying {@link ItemStack} objects
  * with Adventure and Bukkit API components.
  */
-public class ComponentWriter {
+public class ItemComponentWriter {
 
     /**
      * Builder-style wrapper for {@link ItemStack} and its {@link ItemMeta}.
