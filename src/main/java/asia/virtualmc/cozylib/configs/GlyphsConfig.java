@@ -15,6 +15,9 @@ public class GlyphsConfig {
 
     public void load() {
         try {
+            glyphsCache.clear();
+            animationCache.clear();
+
             File directory = new File(CozyLib.getInstance().getDataFolder(), "glyphs");
             Map<String, YamlDocument> files = YamlUtils.getFiles(directory, false);
             for (Map.Entry<String, YamlDocument> entry : files.entrySet()) {

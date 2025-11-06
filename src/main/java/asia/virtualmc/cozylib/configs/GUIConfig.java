@@ -1,6 +1,7 @@
 package asia.virtualmc.cozylib.configs;
 
 import asia.virtualmc.cozylib.CozyLib;
+import asia.virtualmc.cozylib.services.bukkit.ItemComponentWriter;
 import asia.virtualmc.cozylib.services.files.YamlFileReader;
 import dev.dejvokep.boostedyaml.block.implementation.Section;
 import org.bukkit.Material;
@@ -17,13 +18,14 @@ public class GUIConfig {
     private static final Map<String, String> unicodes = new HashMap<>();
 
     public void load() {
-        YamlFileReader.YamlFile file = YamlFileReader.get(CozyLib.getInstance(), "skills-core/default-gui.yml");
+        unicodes.clear();
+
+        YamlFileReader.YamlFile file = YamlFileReader.get(CozyLib.getInstance(), "cozy-skills/guis.yml");
         Section section = file.getSection("settings");
 
         invisibleModel = section.getString("invisible-model");
         leftClickAnimModel = section.getString("left-click-model");
         rightClickAnimModel = section.getString("right-click-model");
-
         unicodes.putAll(file.stringKeyStringMap("titles", false));
     }
 
@@ -40,15 +42,15 @@ public class GUIConfig {
     }
 
     public static ItemStack getInvisibleItem(String name) {
-        return ComponentService.get(Material.PAPER, name, new ArrayList<>(), getInvisibleModel());
+        return ItemComponentWriter.get(Material.PAPER, name, new ArrayList<>(), getInvisibleModel());
     }
 
     public static ItemStack getLeftClickItem(String name) {
-        return ComponentService.get(Material.PAPER, name, new ArrayList<>(), getLeftClickAnim());
+        return ItemComponentWriter.get(Material.PAPER, name, new ArrayList<>(), getLeftClickAnim());
     }
 
     public static ItemStack getRightClickItem(String name) {
-        return ComponentService.get(Material.PAPER, name, new ArrayList<>(), getRightClickAnim());
+        return ItemComponentWriter.get(Material.PAPER, name, new ArrayList<>(), getRightClickAnim());
     }
 
     public static String getMenu(String title) {

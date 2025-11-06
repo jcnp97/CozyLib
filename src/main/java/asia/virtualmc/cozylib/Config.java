@@ -1,5 +1,7 @@
 package asia.virtualmc.cozylib;
 
+import asia.virtualmc.cozylib.configs.GUIConfig;
+import asia.virtualmc.cozylib.configs.GlyphsConfig;
 import asia.virtualmc.cozylib.services.files.YamlFileReader;
 import asia.virtualmc.cozylib.utilities.bukkit.messages.ConsoleUtils;
 
@@ -8,6 +10,9 @@ import java.util.Map;
 import java.util.Set;
 
 public class Config {
+    private final GlyphsConfig glyphsConfig;
+    private final GUIConfig guiConfig;
+
     private static final Set<String> modules = new HashSet<>();
     private static MySQLDatabase database;
     private static ConsoleColors consoleColors;
@@ -18,12 +23,19 @@ public class Config {
     public record MessagePrefixes(String info, String notification, String warning, String severe, String broadcast) {}
 
     public Config() {
+        load();
+        this.glyphsConfig = new GlyphsConfig();
+        this.guiConfig = new GUIConfig();
 
+        glyphsConfig.load();
+        guiConfig.load();
     }
 
     public void load() {
         YamlFileReader.YamlFile reader = YamlFileReader.get(CozyLib.getInstance(), "config.yml");
         try {
+            modules.clear();
+
             // Modules
             Map<String, Boolean> modulesMap = reader.stringKeyBooleanMap("modules", false);
             for (Map.Entry<String, Boolean> entry : modulesMap.entrySet()) {
@@ -57,6 +69,12 @@ public class Config {
         } catch (Exception e) {
             ConsoleUtils.severe("Unable to read config.yml: " + e);
         }
+    }
+
+    public void reload() {
+        load();
+        glyphsConfig.load();
+        guiConfig.load();
     }
 
     public static boolean isEnabled(String moduleName) { return modules.contains(moduleName); }
