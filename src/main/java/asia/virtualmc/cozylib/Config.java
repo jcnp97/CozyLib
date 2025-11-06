@@ -18,8 +18,11 @@ public class Config {
     public record MessagePrefixes(String info, String notification, String warning, String severe, String broadcast) {}
 
     public Config() {
-        YamlFileReader.YamlFile reader = YamlFileReader.get(CozyLib.getInstance(), "config.yml");
 
+    }
+
+    public void load() {
+        YamlFileReader.YamlFile reader = YamlFileReader.get(CozyLib.getInstance(), "config.yml");
         try {
             // Modules
             Map<String, Boolean> modulesMap = reader.stringKeyBooleanMap("modules", false);

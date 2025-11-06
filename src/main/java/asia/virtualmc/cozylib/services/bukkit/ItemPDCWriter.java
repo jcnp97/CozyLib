@@ -1,6 +1,6 @@
 package asia.virtualmc.cozylib.services.bukkit;
 
-import asia.virtualmc.cozylib.integration.MorePDCUtils;
+import asia.virtualmc.cozylib.integrations.MorePDCUtils;
 import asia.virtualmc.cozylib.services.files.YamlFileReader;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;

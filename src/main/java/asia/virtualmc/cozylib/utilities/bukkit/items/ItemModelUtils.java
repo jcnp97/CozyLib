@@ -26,5 +26,21 @@ public class ItemModelUtils {
         return item;
     }
 
+    /**
+     * Removes the custom item model from the given {@link ItemStack}.
+     *
+     * @param item the {@link ItemStack} to modify
+     * @return the same {@link ItemStack} with its custom model removed, or null if the item is null
+     */
+    public static ItemStack remove(ItemStack item) {
+        if (item == null) return null;
 
+        ItemMeta meta = item.getItemMeta();
+        if (meta == null) return item;
+
+        meta.setItemModel(null);
+        item.setItemMeta(meta);
+
+        return item;
+    }
 }

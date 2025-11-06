@@ -1,6 +1,9 @@
-package asia.virtualmc.cozylib.integration;
+package asia.virtualmc.cozylib.integrations;
 
+import asia.virtualmc.cozylib.CozyLib;
+import asia.virtualmc.cozylib.utilities.bukkit.items.ItemStackUtils;
 import asia.virtualmc.cozylib.utilities.bukkit.messages.ConsoleUtils;
+import asia.virtualmc.cozylib.utilities.paper.TaskUtils;
 import com.github.stefvanschie.inventoryframework.gui.GuiItem;
 import com.github.stefvanschie.inventoryframework.gui.type.AnvilGui;
 import com.github.stefvanschie.inventoryframework.gui.type.ChestGui;
@@ -66,7 +69,7 @@ public class IFUtils {
             staticPane.addItem(new GuiItem(clicked), Slot.fromIndex(dummySlot));
             gui.update();
 
-            TaskUtils.delay(Main.getInstance(), () -> {
+            TaskUtils.delay(CozyLib.getInstance(), () -> {
                 if (closeOnClick) {
                     event.getWhoClicked().closeInventory();
                     return;
@@ -150,7 +153,7 @@ public class IFUtils {
     public static void inputGui(@NotNull Player player, String title, Consumer<String> onConfirm) {
         AnvilGui gui = new AnvilGui(title);
 
-        ItemStack confirmItem = ItemStackUtils.create(Material.LIME_CONCRETE, "✔ Confirm", null, 1);
+        ItemStack confirmItem = ItemStackUtils.create(Material.LIME_CONCRETE, "✔ Confirm", null, "");
         GuiItem confirmButton = new GuiItem(confirmItem, event -> {
             event.setCancelled(true);
             String input = gui.getRenameText();

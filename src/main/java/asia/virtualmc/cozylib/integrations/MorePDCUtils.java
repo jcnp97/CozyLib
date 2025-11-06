@@ -1,4 +1,4 @@
-package asia.virtualmc.cozylib.integration;
+package asia.virtualmc.cozylib.integrations;
 
 import com.jeff_media.morepersistentdatatypes.DataType;
 import org.bukkit.Material;
