@@ -6,7 +6,7 @@
 # --------------------------------------------------------------------------------------
 modules:
   sqlite: true
-  mysql: false
+  mysql: true
   worldguard: false
   vault: false
   realistic_seasons: false

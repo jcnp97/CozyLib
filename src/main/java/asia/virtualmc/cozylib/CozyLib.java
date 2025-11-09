@@ -1,7 +1,5 @@
 package asia.virtualmc.cozylib;
 
-import asia.virtualmc.vLibCore.libs.commandapi.CommandAPI;
-import asia.virtualmc.vLibCore.libs.commandapi.CommandAPIPaperConfig;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class CozyLib extends JavaPlugin {
@@ -12,19 +10,10 @@ public final class CozyLib extends JavaPlugin {
     @Override
     public void onEnable() {
         plugin = this;
-        CommandAPI.onEnable();
         new Config();
-        //this.registry = new Registry(this);
+        this.registry = new Registry();
+        new Commands();
     }
-
-    @Override
-    public void onLoad() {
-        CommandAPI.onLoad(new CommandAPIPaperConfig(this)
-                .verboseOutput(false)
-                .silentLogs(true)
-        );
-    }
-
 
     @Override
     public void onDisable() {

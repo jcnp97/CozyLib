@@ -13,6 +13,10 @@ public class GlyphsConfig {
     private static final Map<String, String> glyphsCache = new HashMap<>();
     private static final Map<String, List<String>> animationCache = new HashMap<>();
 
+    /**
+     * Loads all glyph and animation entries from YAML files located in the "glyphs" directory.
+     * Clears existing caches before reloading. Logs duplicate keys or load errors to console.
+     */
     public void load() {
         try {
             glyphsCache.clear();
@@ -46,22 +50,46 @@ public class GlyphsConfig {
                 }
             }
         } catch (Exception e) {
-            ConsoleUtils.severe("An error occurred when trying to read glyphs: " + e);
+            ConsoleUtils.severe("An error occurred when trying to load glyphs: " + e);
         }
     }
 
+    /**
+     * Retrieves a glyph value based on the provided {@link Enums.Glyphs} enum key.
+     *
+     * @param glyph the glyph enum key to look up
+     * @return the corresponding glyph string, or an empty string if not found
+     */
     public static String get(Enums.Glyphs glyph) {
         return glyphsCache.getOrDefault(glyph.getKey(), "");
     }
 
+    /**
+     * Retrieves a glyph value based on the provided string key.
+     *
+     * @param glyph the glyph key as a string
+     * @return the corresponding glyph string, or an empty string if not found
+     */
     public static String get(String glyph) {
         return glyphsCache.getOrDefault(glyph, "");
     }
 
+    /**
+     * Retrieves a list of animation frames associated with the given animation name.
+     *
+     * @param animName the name of the animation
+     * @return a list of animation frame strings, or an empty list if none found
+     */
     public static List<String> getAnimation(String animName) {
         return animationCache.getOrDefault(animName, new ArrayList<>());
     }
 
+    /**
+     * Counts the number of glyph keys that contain the specified substring.
+     *
+     * @param value the substring to match against glyph keys
+     * @return the number of matching glyph keys
+     */
     public static int getCount(String value) {
         return Math.toIntExact(glyphsCache.keySet().stream()
                 .filter(k -> k.contains(value))

@@ -1,6 +1,7 @@
 package asia.virtualmc.cozylib.integrations;
 
 import asia.virtualmc.cozylib.CozyLib;
+import asia.virtualmc.cozylib.configs.GUIConfig;
 import asia.virtualmc.cozylib.utilities.bukkit.items.ItemStackUtils;
 import asia.virtualmc.cozylib.utilities.bukkit.messages.ConsoleUtils;
 import asia.virtualmc.cozylib.utilities.paper.TaskUtils;
@@ -22,6 +23,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class IFUtils {
@@ -71,6 +73,7 @@ public class IFUtils {
 
             TaskUtils.delay(CozyLib.getInstance(), () -> {
                 if (closeOnClick) {
+                    task.run();
                     event.getWhoClicked().closeInventory();
                     return;
                 }
@@ -92,29 +95,27 @@ public class IFUtils {
         UUID uuid = player.getUniqueId();
         responseCache.remove(uuid);
 
-        ChestGui gui = new ChestGui(1, GUIConfig.getMenu("confirmation_menu"));
-        gui.setOnGlobalClick(event -> event.setCancelled(true));
-
+        ChestGui gui = getGui(GUIConfig.getMenu("confirmation_menu"), "cozyvanilla:ui.click", 1);
         StaticPane pane = new StaticPane(0, 0, 9, 1);
 
+        final boolean[] responded = {false};
+
         // Confirm buttons
-        ItemStack confirmButton = GUIConfig.getLeftClickItem("<green>ᴄᴏɴғɪʀᴍ ᴀᴄᴛɪᴏɴ");
-        GuiItem confirm = new GuiItem(confirmButton, event -> {
-            callback.accept(true);
-            event.getWhoClicked().closeInventory();
-        });
-        pane.addItem(confirm, Slot.fromIndex(2));
+        addClickableButton(gui, "<green>Confirm Action", null, "cozyvanilla:confirm_bt",
+                1, () -> {
+                    callback.accept(true);
+                    responded[0] = true;
+                }, true);
 
         // Cancel buttons
-        ItemStack cancelButton = GUIConfig.getLeftClickItem("<red>ᴄᴀɴᴄᴇʟ ᴀᴄᴛɪᴏɴ");
-        GuiItem cancel = new GuiItem(cancelButton, event -> {
-            callback.accept(false);
-            event.getWhoClicked().closeInventory();
-        });
-        pane.addItem(cancel, Slot.fromIndex(6));
+        addClickableButton(gui, "<red>Cancel Action", null, "cozyvanilla:cancel_bt",
+                6, () -> {
+                    callback.accept(false);
+                    responded[0] = true;
+                }, true);
 
         gui.setOnClose(event -> {
-            if (responseCache.add(uuid)) {
+            if (!responded[0] && responseCache.add(uuid)) {
                 callback.accept(false);
             }
         });

@@ -4,8 +4,9 @@ import asia.virtualmc.cozylib.configs.GUIConfig;
 import asia.virtualmc.cozylib.configs.GlyphsConfig;
 import asia.virtualmc.cozylib.services.files.YamlFileReader;
 import asia.virtualmc.cozylib.utilities.bukkit.messages.ConsoleUtils;
+import asia.virtualmc.cozylib.utilities.paper.AsyncUtils;
 
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -13,7 +14,7 @@ public class Config {
     private final GlyphsConfig glyphsConfig;
     private final GUIConfig guiConfig;
 
-    private static final Set<String> modules = new HashSet<>();
+    private static final Map<String, Boolean> modules = new HashMap<>();
     private static MySQLDatabase database;
     private static ConsoleColors consoleColors;
     private static MessagePrefixes messagePrefixes;
@@ -23,26 +24,30 @@ public class Config {
     public record MessagePrefixes(String info, String notification, String warning, String severe, String broadcast) {}
 
     public Config() {
-        load();
         this.glyphsConfig = new GlyphsConfig();
         this.guiConfig = new GUIConfig();
-
-        glyphsConfig.load();
-        guiConfig.load();
+        load();
     }
 
-    public void load() {
+    public boolean load() {
+        try {
+            read();
+            glyphsConfig.load();
+            guiConfig.load();
+
+            return true;
+        } catch (Exception e) {
+            ConsoleUtils.severe("An error occurred when trying to read configs: " + e);
+        }
+
+        return false;
+    }
+
+    private void read() {
         YamlFileReader.YamlFile reader = YamlFileReader.get(CozyLib.getInstance(), "config.yml");
         try {
-            modules.clear();
-
             // Modules
-            Map<String, Boolean> modulesMap = reader.stringKeyBooleanMap("modules", false);
-            for (Map.Entry<String, Boolean> entry : modulesMap.entrySet()) {
-                if (entry.getValue()) {
-                    modules.add(entry.getKey());
-                }
-            }
+            modules.putAll(reader.stringKeyBooleanMap("modules", false));
 
             // MySQL Database
             database = new MySQLDatabase(
@@ -65,19 +70,21 @@ public class Config {
                     reader.getString("message-prefixes.warning"),
                     reader.getString("message-prefixes.severe"),
                     reader.getString("message-prefixes.broadcast"));
-
         } catch (Exception e) {
             ConsoleUtils.severe("Unable to read config.yml: " + e);
         }
     }
 
     public void reload() {
-        load();
-        glyphsConfig.load();
-        guiConfig.load();
+        ConsoleUtils.info("Reloading.. Please wait..");
+        AsyncUtils.runAsyncThenSync(CozyLib.getInstance(), this::load, (result) -> {
+            if (result) {
+                ConsoleUtils.info("Successfully reloaded configs!");
+            }
+        });
     }
 
-    public static boolean isEnabled(String moduleName) { return modules.contains(moduleName); }
+    public static Map<String, Boolean> getModules() { return modules; }
     public static MySQLDatabase getDatabase() { return database; }
     public static ConsoleColors getConsoleColors() { return consoleColors; }
     public static MessagePrefixes getMessagePrefixes() { return messagePrefixes; }
