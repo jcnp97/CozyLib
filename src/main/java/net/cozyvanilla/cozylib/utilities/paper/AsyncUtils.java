@@ -22,7 +22,7 @@ public class AsyncUtils {
      *                      This is where you update Bukkit state or shared memory safely.
      * @param <T>           The type of result produced by the async task and consumed by the sync callback.
      */
-    public static <T> void runAsyncThenSync(Plugin plugin, Supplier<T> asyncTask, Consumer<T> syncCallback) {
+    public static <T> void asyncThenSync(Plugin plugin, Supplier<T> asyncTask, Consumer<T> syncCallback) {
         plugin.getServer().getAsyncScheduler().runNow(plugin, task -> {
             T result;
             try {
@@ -45,7 +45,7 @@ public class AsyncUtils {
      * @param plugin    The plugin instance used to schedule the task.
      * @param asyncTask A Runnable containing the logic to be executed asynchronously.
      */
-    public static void runAsync(Plugin plugin, Runnable asyncTask) {
+    public static void async(Plugin plugin, Runnable asyncTask) {
         plugin.getServer().getAsyncScheduler().runNow(plugin, task -> {
             try {
                 asyncTask.run();
