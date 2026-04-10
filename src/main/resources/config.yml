@@ -15,3 +15,17 @@ redis:
   username: default
   password: password
   ssl: false
+
+modules:
+  console: true
+  messages: true
+  sqlite: true
+  mysql: true
+  redis: false
+
+integrations:
+  world_guard: false
+  excellent_economy: false
+  skins_restorer: false
+  better_model: false
+  packet_events: false

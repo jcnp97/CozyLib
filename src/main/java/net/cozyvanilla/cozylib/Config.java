@@ -1,12 +1,17 @@
 package net.cozyvanilla.cozylib;
 
+import net.cozyvanilla.cozylib.modules.messages.Console;
 import net.cozyvanilla.cozylib.services.files.YamlFileReader;
 import org.bukkit.plugin.Plugin;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class Config {
     private static PluginConfig config;
     private static DatabaseConfig database;
     private static RedisConfig redis;
+    private static final Map<String, Boolean> modules = new HashMap<>();
 
     public record PluginConfig(String prefix, String commandPrefix) {}
     public record DatabaseConfig(String host, int port, String user, String pass, String dbName) {}
@@ -36,6 +41,11 @@ public class Config {
                 reader.get().getString("redis.username"),
                 reader.get().getString("redis.password"),
                 reader.get().getBoolean("redis.ssl"));
+
+        modules.putAll(reader.stringKeyBooleanMap("modules"));
+        modules.putAll(reader.stringKeyBooleanMap("integrations"));
+
+        Console.map(modules);
     }
 
     public static  String getPrefix() {
@@ -52,5 +62,9 @@ public class Config {
 
     public static RedisConfig getRedisConfig() {
         return redis;
+    }
+
+    public static boolean isEnabled(String module) {
+        return modules.getOrDefault(module, false);
     }
 }
