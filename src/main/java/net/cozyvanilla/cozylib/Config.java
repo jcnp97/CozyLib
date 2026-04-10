@@ -1,6 +1,5 @@
 package net.cozyvanilla.cozylib;
 
-import net.cozyvanilla.cozylib.modules.messages.Console;
 import net.cozyvanilla.cozylib.services.files.YamlFileReader;
 import org.bukkit.plugin.Plugin;
 
@@ -44,8 +43,6 @@ public class Config {
 
         modules.putAll(reader.stringKeyBooleanMap("modules"));
         modules.putAll(reader.stringKeyBooleanMap("integrations"));
-
-        Console.map(modules);
     }
 
     public static  String getPrefix() {

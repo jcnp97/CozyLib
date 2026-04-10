@@ -1,5 +1,6 @@
 package net.cozyvanilla.cozylib;
 
+import net.cozyvanilla.cozylib.modules.messages.Console;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class CozyLib extends JavaPlugin {
