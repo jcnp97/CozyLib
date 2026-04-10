@@ -3,6 +3,7 @@ package net.cozyvanilla.cozylib.utilities.bukkit;
 import net.cozyvanilla.cozylib.modules.messages.Console;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -56,7 +57,7 @@ public class SoundUtils {
      * @param volume the sound volume
      * @param pitch the sound pitch
      */
-    public static void playTo(Player player, String soundName, float volume, float pitch) {
+    public static void playTo(@NotNull Player player, String soundName, float volume, float pitch) {
         if (!player.isOnline() || soundName.isEmpty()) return;
 
         Sound sound = get(soundName, volume, pitch);
@@ -69,7 +70,7 @@ public class SoundUtils {
      * @param player the player to play the sound to
      * @param soundName the sound name to play
      */
-    public static void playTo(Player player, String soundName) {
+    public static void playTo(@NotNull Player player, String soundName) {
         playTo(player, soundName, 1.0f, 1.0f);
     }
 
@@ -105,12 +106,33 @@ public class SoundUtils {
      * @param player the player to stop the sound for
      * @param soundName the sound name to stop
      */
-    public static void stop(Player player, String soundName) {
-        if (player == null || !player.isOnline()) return;
+    public static void stop(@NotNull Player player, String soundName) {
+        if (!player.isOnline()) return;
 
         Sound sound = get(soundName, 1.0f, 1.0f);
         if (sound != null) {
             player.stopSound(sound);
         }
+    }
+
+    /**
+     * Plays a sound to all players on the server using the given volume and pitch.
+     *
+     * @param soundName the sound name to play
+     * @param volume the sound volume
+     * @param pitch the sound pitch
+     */
+    public static void playToAll(String soundName, float volume, float pitch) {
+        Sound sound = get(soundName, volume, pitch);
+        if (sound != null) Bukkit.getServer().playSound(sound);
+    }
+
+    /**
+     * Plays a sound to all players on the server with default volume and pitch of 1.0.
+     *
+     * @param soundName the sound name to play
+     */
+    public static void playToAll(String soundName) {
+        playToAll(soundName, 1.0f, 1.0f);
     }
 }

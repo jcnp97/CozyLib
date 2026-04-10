@@ -13,7 +13,7 @@ import java.util.Set;
 
 public class Console {
     private static MessageType messageType;
-    public record MessageType(String INFO, String WARNING, String SEVERE) {}
+    private record MessageType(String INFO, String WARNING, String SEVERE) {}
 
     public Console(Plugin plugin) {
         YamlFileReader file = new YamlFileReader(plugin, "modules/console.yml");
