@@ -13,7 +13,8 @@ public class Config {
     public record RedisConfig(String host, int port, String user, String password, boolean ssl) {}
 
     public Config(Plugin plugin) {
-
+        YamlFileReader reader = new YamlFileReader(plugin, "config.yml");
+        readConfig(reader);
     }
 
     private void readConfig(YamlFileReader reader) {
@@ -37,8 +38,12 @@ public class Config {
                 reader.get().getBoolean("redis.ssl"));
     }
 
-    public static  PluginConfig getConfig() {
-        return config;
+    public static  String getPrefix() {
+        return config.prefix();
+    }
+
+    public static  String getCommandPrefix() {
+        return config.commandPrefix();
     }
 
     public static DatabaseConfig getDatabaseConfig() {
