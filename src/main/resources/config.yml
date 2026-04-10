@@ -17,7 +17,6 @@ redis:
   ssl: false
 
 modules:
-  console: true
   messages: true
   sqlite: true
   mysql: true

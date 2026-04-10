@@ -61,6 +61,8 @@ public class Config {
         return redis;
     }
 
+    public static Map<String, Boolean> getModules() { return modules; }
+
     public static boolean isEnabled(String module) {
         return modules.getOrDefault(module, false);
     }
