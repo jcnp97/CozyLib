@@ -1,0 +1,36 @@
+time_zone: "Asia/Singapore"
+schedule:
+  0: SPRING
+  1: SPRING
+  2: SUMMER
+  3: SUMMER
+  4: FALL
+  5: FALL
+  6: WINTER
+  7: SUMMER
+  8: SUMMER
+  9: FALL
+  10: FALL
+  11: WINTER
+  12: WINTER
+  13: SPRING
+  14: FALL
+  15: FALL
+  16: WINTER
+  17: WINTER
+  18: SPRING
+  19: SPRING
+  20: SUMMER
+  21: WINTER
+  22: WINTER
+  23: SPRING
+  24: SPRING
+  25: SUMMER
+  26: SUMMER
+  27: FALL
+messages:
+  spring: "Flowers are blooming, bees are out, and the world feels fresh again. Spring has started!"
+  summer: "Long bright days and warm breezes fill the world. Summer has started!"
+  fall: "Leaves are turning, the air feels crisp, and the world is glowing with cozy colors. Fall has started!"
+  winter: "Snow covers the land, and everything feels calm and quiet. Winter has started!"
+permission: "cozylib.seasons.admin"
