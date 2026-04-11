@@ -258,4 +258,8 @@ public class JsonFileWriter {
     public Gson getGson() {
         return gson;
     }
+
+    public File getFile() {
+        return file;
+    }
 }

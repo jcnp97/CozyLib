@@ -21,6 +21,7 @@ modules:
   sqlite: true
   mysql: true
   redis: false
+  seasons: true
 
 integrations:
   world_guard: false

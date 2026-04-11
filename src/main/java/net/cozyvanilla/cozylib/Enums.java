@@ -40,18 +40,22 @@ public class Enums {
         ADD, SUBTRACT, MULTIPLY, DIVIDE, SET;
     }
 
-    public enum TimeUnits {
+    public enum DayUnits {
         HOURLY(3600),
         DAILY(86400),
         WEEKLY(604800),
         MONTHLY(2592000);
         private final long seconds;
-        TimeUnits(long seconds) {
+        DayUnits(long seconds) {
             this.seconds = seconds;
         }
         public long getSeconds() {
             return seconds;
         }
+    }
+
+    public enum TimeUnits {
+        HOUR, MINUTE, SECOND
     }
 
     public enum RayTraceType {

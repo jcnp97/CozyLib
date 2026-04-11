@@ -208,4 +208,8 @@ public class JsonFileReader {
     public JsonObject getRoot() {
         return root;
     }
+
+    public File getFile() {
+        return file;
+    }
 }

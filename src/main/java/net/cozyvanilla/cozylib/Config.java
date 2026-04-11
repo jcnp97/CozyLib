@@ -11,6 +11,7 @@ public class Config {
     private static DatabaseConfig database;
     private static RedisConfig redis;
     private static final Map<String, Boolean> modules = new HashMap<>();
+    private static final Map<String, Boolean> integrations = new HashMap<>();
 
     public record PluginConfig(String prefix, String commandPrefix) {}
     public record DatabaseConfig(String host, int port, String user, String pass, String dbName) {}
@@ -42,7 +43,7 @@ public class Config {
                 reader.get().getBoolean("redis.ssl"));
 
         modules.putAll(reader.stringKeyBooleanMap("modules"));
-        modules.putAll(reader.stringKeyBooleanMap("integrations"));
+        integrations.putAll(reader.stringKeyBooleanMap("integrations"));
     }
 
     public static  String getPrefix() {
@@ -62,6 +63,8 @@ public class Config {
     }
 
     public static Map<String, Boolean> getModules() { return modules; }
+
+    public static Map<String, Boolean> getIntegrations() { return integrations; }
 
     public static boolean isEnabled(String module) {
         return modules.getOrDefault(module, false);
