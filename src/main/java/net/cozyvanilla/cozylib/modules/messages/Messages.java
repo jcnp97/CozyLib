@@ -1,6 +1,7 @@
 package net.cozyvanilla.cozylib.modules.messages;
 
 import net.cozyvanilla.cozylib.Enums;
+import net.cozyvanilla.cozylib.modules.Module;
 import net.cozyvanilla.cozylib.services.files.YamlFileReader;
 import net.cozyvanilla.cozylib.utilities.bukkit.SoundUtils;
 import net.cozyvanilla.cozylib.utilities.messages.AdventureUtils;
@@ -9,7 +10,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
-public class Messages {
+public final class Messages implements Module<Void> {
+    private final Plugin plugin;
+
     private static Colors colors;
     private static Icons icons;
     private static Sounds sounds;
@@ -19,6 +22,27 @@ public class Messages {
     private record Sounds(String INFO, String WARNING, String SEVERE, String NOTIFICATION, String BROADCAST) {}
 
     public Messages(Plugin plugin) {
+        this.plugin = plugin;
+        enable();
+    }
+
+    @Override
+    public String getName() {
+        return "Player/Broadcast Messages";
+    }
+
+    @Override
+    public String getPrefix() {
+        return "[CozyMessages]";
+    }
+
+    @Override
+    public Void getCommands() {
+        return null;
+    }
+
+    @Override
+    public void enable() {
         YamlFileReader file = new YamlFileReader(plugin, "modules/messages.yml");
 
         colors = new Colors(
@@ -45,6 +69,9 @@ public class Messages {
                 file.get().getString("sound.broadcast")
         );
     }
+
+    @Override
+    public void disable() {}
 
     private static String getColor(Enums.MessageType type) {
         return switch (type) {

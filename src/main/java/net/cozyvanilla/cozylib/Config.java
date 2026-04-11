@@ -46,11 +46,11 @@ public class Config {
         integrations.putAll(reader.stringKeyBooleanMap("integrations"));
     }
 
-    public static  String getPrefix() {
+    public static String getPrefix() {
         return config.prefix();
     }
 
-    public static  String getCommandPrefix() {
+    public static String getCommandPrefix() {
         return config.commandPrefix();
     }
 

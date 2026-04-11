@@ -1,6 +1,7 @@
 package net.cozyvanilla.cozylib.modules.messages;
 
 import net.cozyvanilla.cozylib.Config;
+import net.cozyvanilla.cozylib.modules.Module;
 import net.cozyvanilla.cozylib.services.files.YamlFileReader;
 import net.cozyvanilla.cozylib.utilities.messages.AdventureUtils;
 import org.bukkit.Bukkit;
@@ -11,11 +12,34 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class Console {
+public final class Console implements Module<Void> {
+    private final Plugin plugin;
+
     private static MessageType messageType;
     private record MessageType(String INFO, String WARNING, String SEVERE) {}
 
     public Console(Plugin plugin) {
+        this.plugin = plugin;
+        enable();
+    }
+
+    @Override
+    public String getName() {
+        return "Console Messages";
+    }
+
+    @Override
+    public String getPrefix() {
+        return "[CozyConsole]";
+    }
+
+    @Override
+    public Void getCommands() {
+        return null;
+    }
+
+    @Override
+    public void enable() {
         YamlFileReader file = new YamlFileReader(plugin, "modules/console.yml");
         messageType = new MessageType(
                 file.get().getString("color.info"),
@@ -23,6 +47,9 @@ public class Console {
                 file.get().getString("color.severe")
         );
     }
+
+    @Override
+    public void disable() {}
 
     /**
      * Sends an info message to the console using the provided prefix.
