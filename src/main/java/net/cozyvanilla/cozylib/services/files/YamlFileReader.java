@@ -12,8 +12,8 @@ import java.io.InputStream;
 import java.util.*;
 
 public class YamlFileReader {
-    private final String PREFIX;
-    private final YamlDocument YAML;
+    private final String prefix;
+    private final YamlDocument yaml;
 
     /**
      * Constructs a YamlFileReader instance.
@@ -23,8 +23,8 @@ public class YamlFileReader {
      * @param fileName the name of the YAML file to load
      */
     public YamlFileReader(@NotNull Plugin plugin, @NotNull String fileName) {
-        this.PREFIX = "[" + plugin.getName() + "]";
-        this.YAML = init(plugin, fileName);
+        this.prefix = "[" + plugin.getName() + "]";
+        this.yaml = init(plugin, fileName);
     }
 
     /**
@@ -45,7 +45,7 @@ public class YamlFileReader {
                     ? YamlDocument.create(file, defaultFile)
                     : YamlDocument.create(file);
         } catch (IOException e) {
-            throw new IllegalStateException("[" + plugin.getName() + "] Failed to load YAML file: " + fileName, e);
+            throw new IllegalStateException(prefix + " Failed to load YAML file: " + fileName, e);
         }
     }
 
@@ -54,7 +54,7 @@ public class YamlFileReader {
      *
      * @return the YAML document
      */
-    public YamlDocument get() { return YAML; }
+    public YamlDocument get() { return yaml; }
 
     /**
      * Retrieves a section from the YAML using the given route.
@@ -64,9 +64,9 @@ public class YamlFileReader {
      * @throws IllegalStateException if the section does not exist
      */
     public Section getSection(String route) {
-        Section section = YAML.getSection(route);
+        Section section = yaml.getSection(route);
         if (section == null) {
-            throw new IllegalStateException(PREFIX + " Section " + route + " not found from Yaml File " + YAML.getNameAsString());
+            throw new IllegalStateException(prefix + " Section " + route + " not found from Yaml File " + yaml.getNameAsString());
         }
         return section;
     }
