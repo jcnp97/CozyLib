@@ -8,30 +8,41 @@ import org.jetbrains.annotations.Nullable;
 import java.io.*;
 import java.nio.file.Files;
 
-public class JsonFileReader<T> {
+public class JsonFileReader {
+
     private final String prefix;
     private final Gson gson;
-    private final T data;
+    private final File file;
     private final JsonObject root;
 
     /**
-     * Initializes the reader by loading a JSON file and mapping it to the specified class.
+     * Initializes the reader by loading a JSON file from the plugin data folder.
      *
      * @param plugin   the plugin instance
      * @param fileName the file name to load
-     * @param clazz    the class to deserialize into
      */
-    public JsonFileReader(@NotNull Plugin plugin, @NotNull String fileName, @NotNull Class<T> clazz) {
+    public JsonFileReader(@NotNull Plugin plugin, @NotNull String fileName) {
         this.prefix = "[" + plugin.getName() + "]";
         this.gson = new GsonBuilder().setPrettyPrinting().create();
-
-        File file = init(plugin, fileName);
-        this.root = load(file);
-        this.data = gson.fromJson(root, clazz);
+        this.file = init(plugin, fileName);
+        this.root = load();
     }
 
     /**
-     * Creates the file if it does not exist and copies default resource if available.
+     * Initializes the reader using an existing file.
+     *
+     * @param plugin the plugin instance
+     * @param file   the file to load
+     */
+    public JsonFileReader(@NotNull Plugin plugin, @NotNull File file) {
+        this.prefix = "[" + plugin.getName() + "]";
+        this.gson = new GsonBuilder().setPrettyPrinting().create();
+        this.file = file;
+        this.root = load();
+    }
+
+    /**
+     * Creates the file if missing and copies default resource if available.
      *
      * @param plugin   the plugin instance
      * @param fileName the file name
@@ -41,9 +52,7 @@ public class JsonFileReader<T> {
         File file = new File(plugin.getDataFolder(), fileName);
 
         File parent = file.getParentFile();
-        if (parent != null) {
-            parent.mkdirs();
-        }
+        if (parent != null) parent.mkdirs();
 
         try {
             if (!file.exists()) {
@@ -58,7 +67,6 @@ public class JsonFileReader<T> {
                     }
                 }
             }
-
             return file;
         } catch (IOException e) {
             throw new IllegalStateException(prefix + " Failed to load JSON file: " + fileName, e);
@@ -66,12 +74,11 @@ public class JsonFileReader<T> {
     }
 
     /**
-     * Loads the root {@link JsonObject} from the file.
+     * Loads and parses the JSON file into a root {@link JsonObject}.
      *
-     * @param file the file to read
      * @return parsed root object
      */
-    private JsonObject load(File file) {
+    private JsonObject load() {
         try (Reader reader = new FileReader(file)) {
             JsonElement element = JsonParser.parseReader(reader);
             return element != null && element.isJsonObject()
@@ -83,10 +90,10 @@ public class JsonFileReader<T> {
     }
 
     /**
-     * Retrieves a {@link JsonElement} from the root using a dot-separated path.
+     * Retrieves a {@link JsonElement} using a dot-separated path.
      *
      * @param path the path to the element
-     * @return found element or null
+     * @return element or null if not found
      */
     @Nullable
     private JsonElement getElement(@NotNull String path) {
@@ -94,46 +101,15 @@ public class JsonFileReader<T> {
         JsonElement current = root;
 
         for (String part : parts) {
-            if (current == null || !current.isJsonObject()) {
-                return null;
-            }
+            if (!current.isJsonObject()) return null;
 
-            JsonObject object = current.getAsJsonObject();
-            if (!object.has(part)) {
-                return null;
-            }
+            JsonObject obj = current.getAsJsonObject();
+            if (!obj.has(part)) return null;
 
-            current = object.get(part);
+            current = obj.get(part);
         }
 
         return current;
-    }
-
-    /**
-     * Gets the deserialized root object.
-     *
-     * @return mapped data
-     */
-    public T get() {
-        return data;
-    }
-
-    /**
-     * Gets the root {@link JsonObject}.
-     *
-     * @return root object
-     */
-    public JsonObject getRoot() {
-        return root;
-    }
-
-    /**
-     * Gets the {@link Gson} instance used by this reader.
-     *
-     * @return gson instance
-     */
-    public Gson getGson() {
-        return gson;
     }
 
     /**
@@ -142,17 +118,9 @@ public class JsonFileReader<T> {
      * @param path the path to the value
      * @return string value or null
      */
-    @Nullable
-    public String getString(@NotNull String path) {
-        JsonElement element = getElement(path);
-        if (element == null || !element.isJsonPrimitive()) {
-            return null;
-        }
-
-        JsonPrimitive primitive = element.getAsJsonPrimitive();
-        return primitive.isString() || primitive.isNumber() || primitive.isBoolean()
-                ? primitive.getAsString()
-                : null;
+    public @Nullable String getString(@NotNull String path) {
+        JsonElement e = getElement(path);
+        return (e != null && e.isJsonPrimitive()) ? e.getAsString() : null;
     }
 
     /**
@@ -161,35 +129,10 @@ public class JsonFileReader<T> {
      * @param path the path to the value
      * @return integer value or null
      */
-    @Nullable
-    public Integer getInt(@NotNull String path) {
-        JsonElement element = getElement(path);
-        if (element == null || !element.isJsonPrimitive()) {
-            return null;
-        }
-
+    public @Nullable Integer getInt(@NotNull String path) {
+        JsonElement e = getElement(path);
         try {
-            return element.getAsInt();
-        } catch (Exception ignored) {
-            return null;
-        }
-    }
-
-    /**
-     * Gets a double value from the given path.
-     *
-     * @param path the path to the value
-     * @return double value or null
-     */
-    @Nullable
-    public Double getDouble(@NotNull String path) {
-        JsonElement element = getElement(path);
-        if (element == null || !element.isJsonPrimitive()) {
-            return null;
-        }
-
-        try {
-            return element.getAsDouble();
+            return (e != null && e.isJsonPrimitive()) ? e.getAsInt() : null;
         } catch (Exception ignored) {
             return null;
         }
@@ -201,15 +144,25 @@ public class JsonFileReader<T> {
      * @param path the path to the value
      * @return boolean value or null
      */
-    @Nullable
-    public Boolean getBoolean(@NotNull String path) {
-        JsonElement element = getElement(path);
-        if (element == null || !element.isJsonPrimitive()) {
+    public @Nullable Boolean getBoolean(@NotNull String path) {
+        JsonElement e = getElement(path);
+        try {
+            return (e != null && e.isJsonPrimitive()) ? e.getAsBoolean() : null;
+        } catch (Exception ignored) {
             return null;
         }
+    }
 
+    /**
+     * Gets a double value from the given path.
+     *
+     * @param path the path to the value
+     * @return double value or null
+     */
+    public @Nullable Double getDouble(@NotNull String path) {
+        JsonElement e = getElement(path);
         try {
-            return element.getAsBoolean();
+            return (e != null && e.isJsonPrimitive()) ? e.getAsDouble() : null;
         } catch (Exception ignored) {
             return null;
         }
@@ -221,12 +174,9 @@ public class JsonFileReader<T> {
      * @param path the path to the object
      * @return JsonObject or null
      */
-    @Nullable
-    public JsonObject getObject(@NotNull String path) {
-        JsonElement element = getElement(path);
-        return element != null && element.isJsonObject()
-                ? element.getAsJsonObject()
-                : null;
+    public @Nullable JsonObject getObject(@NotNull String path) {
+        JsonElement e = getElement(path);
+        return (e != null && e.isJsonObject()) ? e.getAsJsonObject() : null;
     }
 
     /**
@@ -235,17 +185,27 @@ public class JsonFileReader<T> {
      * @param path the path to the array
      * @return JsonArray or null
      */
-    @Nullable
-    public JsonArray getArray(@NotNull String path) {
-        JsonElement element = getElement(path);
-        return element != null && element.isJsonArray()
-                ? element.getAsJsonArray()
-                : null;
+    public @Nullable JsonArray getArray(@NotNull String path) {
+        JsonElement e = getElement(path);
+        return (e != null && e.isJsonArray()) ? e.getAsJsonArray() : null;
     }
 
-    @Nullable
-    public <E> E read(@NotNull String path, @NotNull Class<E> clazz) {
-        JsonElement element = getElement(path);
-        return element != null ? gson.fromJson(element, clazz) : null;
+    /**
+     * Checks if the given path exists in the JSON.
+     *
+     * @param path the path to check
+     * @return true if exists, false otherwise
+     */
+    public boolean contains(@NotNull String path) {
+        return getElement(path) != null;
+    }
+
+    /**
+     * Gets the root {@link JsonObject}.
+     *
+     * @return root object
+     */
+    public JsonObject getRoot() {
+        return root;
     }
 }
