@@ -1,4 +1,4 @@
-package net.cozyvanilla.cozylib.utilities.misc;
+package net.cozyvanilla.cozylib.utilities.time;
 
 import net.cozyvanilla.cozylib.Enums;
 
