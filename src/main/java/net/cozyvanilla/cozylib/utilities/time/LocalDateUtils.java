@@ -16,7 +16,7 @@ public class LocalDateUtils {
      * @param timezone the timezone ID
      * @return valid ZoneId or system default
      */
-    public static ZoneId getZoneId(String timezone) {
+    public static ZoneId zoneId(String timezone) {
         try {
             return ZoneId.of(timezone);
         } catch (Exception e) {
@@ -33,8 +33,8 @@ public class LocalDateUtils {
      * @param timezone  the timezone to use
      * @return number of days since the past instant
      */
-    public static long getDaysSince(Instant past, String timezone) {
-        ZoneId zone = getZoneId(timezone);
+    public static long daysSince(Instant past, String timezone) {
+        ZoneId zone = zoneId(timezone);
         LocalDate pastDate = past.atZone(zone).toLocalDate();
         return ChronoUnit.DAYS.between(pastDate, LocalDate.now(zone));
     }
