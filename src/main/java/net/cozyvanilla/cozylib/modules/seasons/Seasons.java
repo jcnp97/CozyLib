@@ -67,6 +67,8 @@ public final class Seasons implements Module<SeasonsCommands> {
 
     @Override
     public void enable() {
+        SeasonsAPI.register(this);
+
         // Read configs
         YamlFileReader config = new YamlFileReader(plugin, "modules/seasons.yml");
         timeZone = config.get().getString("time_zone");
@@ -103,8 +105,9 @@ public final class Seasons implements Module<SeasonsCommands> {
 
     @Override
     public void disable() {
-        task.cancel();
+        if (task != null) task.cancel();
         getServer().getMessenger().unregisterOutgoingPluginChannel(plugin, channel);
+        SeasonsAPI.unregister(this);
     }
 
     public void set(Enums.Seasons season) {
@@ -126,7 +129,7 @@ public final class Seasons implements Module<SeasonsCommands> {
         modPacket(player, currentSeason.toString().toLowerCase());
     }
 
-    public Enums.Seasons get() {
+    public Enums.Seasons getCurrentSeason() {
         return currentSeason;
     }
 
