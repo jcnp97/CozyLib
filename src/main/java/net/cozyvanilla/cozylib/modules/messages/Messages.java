@@ -23,7 +23,6 @@ public final class Messages implements Module<Void> {
 
     public Messages(Plugin plugin) {
         this.plugin = plugin;
-        enable();
     }
 
     @Override

@@ -8,7 +8,6 @@ import net.cozyvanilla.cozylib.modules.seasons.Seasons;
 import org.bukkit.plugin.Plugin;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 public class Modules {
@@ -25,57 +24,64 @@ public class Modules {
     }
 
     private void register() {
+        // always enabled
         this.console = new Console(plugin);
+        console.enable();
+
+        // modules are always registered
+        this.messages = new Messages(plugin);
+        this.seasons = new Seasons(plugin);
 
         Console.info("", "=======================================");
         Console.info("", "Modules Loaded:");
 
+        // MESSAGES MODULE
         if (Config.isEnabled("messages")) {
-            this.messages = new Messages(plugin);
+            messages.enable();
             Console.info("", "- Player/Broadcast Messages");
         } else {
             Console.severe("", "- Player/Broadcast Messages");
         }
 
+        // SEASONS MODULE
+        if (Config.isEnabled("seasons")) {
+            seasons.enable();
+            commands.add(seasons.getCommands().get());
+            Console.info("", "- CozySeasons");
+        } else {
+            Console.severe("", "- CozySeasons");
+        }
+
+        // SQLITE MODULE
         if (Config.isEnabled("sqlite")) {
             Console.info("", "- SQLite Storage");
         } else {
             Console.severe("", "- SQLite Storage");
         }
 
+        // MYSQL MODULE
         if (Config.isEnabled("mysql")) {
             Console.info("", "- MySQL Database");
         } else {
             Console.severe("", "- MySQL Database");
         }
 
+        // REDIS MODULE
         if (Config.isEnabled("redis")) {
             Console.info("", "- Redis/Cross-Server Syncing");
         } else {
             Console.severe("", "- Redis/Cross-Server Syncing");
         }
 
-        if (Config.isEnabled("seasons")) {
-            this.seasons = new Seasons(plugin);
-            Console.info("", "- CozySeasons");
-        } else {
-            Console.severe("", "- CozySeasons");
-        }
-
         Console.info("", "=======================================");
-        enable();
-    }
 
-    public void enable() {
-        if (Config.isEnabled("seasons")) {
-            seasons.enable();
-            commands.add(seasons.getCommands().get());
-        }
-
+        // register all enabled module's commands
         registerCommands();
     }
 
     public void disable() {
+        console.disable();
+        messages.disable();
         seasons.disable();
     }
 

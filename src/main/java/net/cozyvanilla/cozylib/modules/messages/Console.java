@@ -20,7 +20,6 @@ public final class Console implements Module<Void> {
 
     public Console(Plugin plugin) {
         this.plugin = plugin;
-        enable();
     }
 
     @Override
