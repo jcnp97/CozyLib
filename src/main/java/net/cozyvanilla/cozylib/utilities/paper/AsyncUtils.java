@@ -1,5 +1,6 @@
 package net.cozyvanilla.cozylib.utilities.paper;
 
+import net.cozyvanilla.cozylib.CozyLib;
 import net.cozyvanilla.cozylib.modules.messages.Console;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
@@ -10,48 +11,40 @@ import java.util.function.Supplier;
 public class AsyncUtils {
 
     /**
-     * Runs a task asynchronously and then schedules a follow-up task on the main server thread with the result.
-     * Use this for workflows like:
-     * - Retrieving data from a database or external source (off-thread)
-     * - Updating in-memory state or using Bukkit API (main thread)
+     * Runs a task asynchronously, then executes a callback on the main thread with the result.
      *
-     * @param plugin        The plugin instance used to schedule both async and sync tasks.
-     * @param asyncTask     A Supplier that returns the result of an asynchronous operation.
-     *                      This will be executed off the main thread using Paper's async scheduler.
-     * @param syncCallback  A Consumer that accepts the result returned by asyncTask and runs on the main thread.
-     *                      This is where you update Bukkit state or shared memory safely.
-     * @param <T>           The type of result produced by the async task and consumed by the sync callback.
+     * @param plugin   the plugin that owns the scheduled tasks
+     * @param task     the async task that produces a result
+     * @param callback the sync callback that receives the task result
      */
-    public static <T> void asyncThenSync(Plugin plugin, Supplier<T> asyncTask, Consumer<T> syncCallback) {
-        plugin.getServer().getAsyncScheduler().runNow(plugin, task -> {
+    public static <T> void asyncThenSync(Plugin plugin, Supplier<T> task, Consumer<T> callback) {
+        String prefix = "[" + plugin.getName() + "] ";
+        plugin.getServer().getAsyncScheduler().runNow(plugin, t -> {
             T result;
             try {
-                result = asyncTask.get();
+                result = task.get();
             } catch (Exception e) {
-                Console.severe("Async task failed: " + e.getMessage());
-                e.printStackTrace();
+                Console.severe(prefix, "Async task failed: " + e.getMessage());
                 return;
             }
 
-            Bukkit.getScheduler().runTask(plugin, () -> syncCallback.accept(result));
+            Bukkit.getScheduler().runTask(plugin, () -> callback.accept(result));
         });
     }
 
     /**
-     * Runs the given task asynchronously using Paper's async scheduler.
-     * This is suitable for IO-bound or long-running tasks that do not require any
-     * interaction with Bukkit API or the main server thread.
+     * Runs a task asynchronously.
      *
-     * @param plugin    The plugin instance used to schedule the task.
-     * @param asyncTask A Runnable containing the logic to be executed asynchronously.
+     * @param plugin the plugin that owns the scheduled task
+     * @param task   the task to execute off the main thread
      */
-    public static void async(Plugin plugin, Runnable asyncTask) {
-        plugin.getServer().getAsyncScheduler().runNow(plugin, task -> {
+    public static void async(Plugin plugin, Runnable task) {
+        String prefix = "[" + plugin.getName() + "] ";
+        plugin.getServer().getAsyncScheduler().runNow(plugin, t -> {
             try {
-                asyncTask.run();
+                task.run();
             } catch (Exception e) {
-                Console.severe("Async task failed: " + e.getMessage());
-                e.printStackTrace();
+                Console.severe(prefix, "Async task failed: " + e.getMessage());
             }
         });
     }

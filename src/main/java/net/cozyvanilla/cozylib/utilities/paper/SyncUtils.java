@@ -10,91 +10,59 @@ import java.util.function.Supplier;
 public class SyncUtils {
 
     /**
-     * Runs a task synchronously on the main thread first, then schedules a follow-up task asynchronously with the result.
-     * This is the opposite of AsyncUtils.runAsyncThenSync().
-     * Use this for workflows like:
-     * - Gathering data from Bukkit API or main thread state (main thread)
-     * - Processing or storing that data externally without blocking the server (async thread)
+     * Runs a task on the main thread, then executes a callback asynchronously with the result.
      *
-     * @param plugin        The plugin instance used to schedule the async follow-up task.
-     * @param syncTask      A Supplier that returns the result of a synchronous operation on the main thread.
-     *                      This will be executed immediately if already on main thread, or scheduled if not.
-     * @param asyncCallback A Consumer that accepts the result returned by syncTask and runs asynchronously.
-     *                      This is where you can perform IO operations or heavy processing without blocking the server.
-     * @param <T>           The type of result produced by the sync task and consumed by the async callback.
+     * @param plugin   the plugin that owns the scheduled tasks
+     * @param task     the sync task that produces a result
+     * @param callback the async callback that receives the task result
      */
-    public static <T> void syncThenAsync(Plugin plugin, Supplier<T> syncTask, Consumer<T> asyncCallback) {
-        if (Bukkit.isPrimaryThread()) {
-            T result;
+    public static <T> void syncThenAsync(Plugin plugin, Supplier<T> task, Consumer<T> callback) {
+        String prefix = "[" + plugin.getName() + "] ";
+        Runnable syncPhase = () -> {
+            final T result;
             try {
-                result = syncTask.get();
+                result = task.get();
             } catch (Exception e) {
-                Console.severe("Sync task failed: " + e.getMessage());
-                e.printStackTrace();
+                Console.severe(prefix, "Sync task failed: " + e.getMessage());
                 return;
             }
 
-            // Schedule async callback
-            plugin.getServer().getAsyncScheduler().runNow(plugin, task -> {
+            plugin.getServer().getAsyncScheduler().runNow(plugin, scheduledTask -> {
                 try {
-                    asyncCallback.accept(result);
+                    callback.accept(result);
                 } catch (Exception e) {
-                    Console.severe("Async callback failed: " + e.getMessage());
-                    e.printStackTrace();
+                    Console.severe(prefix, "Async callback failed: " + e.getMessage());
                 }
             });
-        } else {
-            Bukkit.getScheduler().runTask(plugin, () -> {
-                T result;
-                try {
-                    result = syncTask.get();
-                } catch (Exception e) {
-                    Console.severe("Sync task failed: " + e.getMessage());
-                    e.printStackTrace();
-                    return;
-                }
+        };
 
-                // Schedule async callback
-                plugin.getServer().getAsyncScheduler().runNow(plugin, task -> {
-                    try {
-                        asyncCallback.accept(result);
-                    } catch (Exception e) {
-                        Console.severe("Async callback failed: " + e.getMessage());
-                        e.printStackTrace();
-                    }
-                });
-            });
+        if (Bukkit.isPrimaryThread()) {
+            syncPhase.run();
+        } else {
+            Bukkit.getScheduler().runTask(plugin, syncPhase);
         }
     }
 
     /**
-     * Runs the given task synchronously on the main server thread.
-     * This ensures the task executes on the main thread regardless of the calling thread,
-     * making it safe for Bukkit API usage and shared state modification.
+     * Runs a task on the main thread.
      *
-     * If called from the main thread, the task executes immediately.
-     * If called from another thread, the task is scheduled to run on the main thread.
-     *
-     * @param plugin   The plugin instance used to schedule the task if not already on main thread.
-     * @param syncTask A Runnable containing the logic to be executed on the main thread.
+     * @param plugin   the plugin that owns the scheduled task
+     * @param syncTask the task to run on the main thread
      */
     public static void sync(Plugin plugin, Runnable syncTask) {
-        if (Bukkit.isPrimaryThread()) {
+        String prefix = "[" + plugin.getName() + "] ";
+        Runnable wrapped = () -> {
             try {
                 syncTask.run();
             } catch (Exception e) {
-                Console.severe("Sync task failed: " + e.getMessage());
-                e.printStackTrace();
+                Console.severe(prefix, "Sync task failed: " + e.getMessage());
             }
+        };
+
+        if (Bukkit.isPrimaryThread()) {
+            wrapped.run();
         } else {
-            Bukkit.getScheduler().runTask(plugin, () -> {
-                try {
-                    syncTask.run();
-                } catch (Exception e) {
-                    Console.severe("Sync task failed: " + e.getMessage());
-                    e.printStackTrace();
-                }
-            });
+            Bukkit.getScheduler().runTask(plugin, wrapped);
         }
     }
 }
