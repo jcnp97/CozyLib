@@ -101,4 +101,9 @@ public class Enums {
         UPSERT,
         DELETE
     }
+
+    public enum Ordering {
+        ASC,
+        DESC
+    }
 }
