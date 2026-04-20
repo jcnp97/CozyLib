@@ -1,4 +1,4 @@
-package net.cozyvanilla.cozylib.modules.mysql;
+package net.cozyvanilla.cozylib.modules.mysql.abstracts;
 
 public abstract class AbstractMySQLImpl {
 

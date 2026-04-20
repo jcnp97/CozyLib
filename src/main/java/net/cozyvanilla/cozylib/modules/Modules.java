@@ -4,6 +4,7 @@ import dev.jorel.commandapi.CommandAPICommand;
 import net.cozyvanilla.cozylib.Config;
 import net.cozyvanilla.cozylib.modules.messages.Console;
 import net.cozyvanilla.cozylib.modules.messages.Messages;
+import net.cozyvanilla.cozylib.modules.mysql.MySQLDatabase;
 import net.cozyvanilla.cozylib.modules.seasons.Seasons;
 import org.bukkit.plugin.Plugin;
 
@@ -17,6 +18,7 @@ public class Modules {
     private Console console;
     private Messages messages;
     private Seasons seasons;
+    private MySQLDatabase mysql;
 
     public Modules(Plugin plugin) {
         this.plugin = plugin;
@@ -31,6 +33,7 @@ public class Modules {
         // modules are always registered
         this.messages = new Messages(plugin);
         this.seasons = new Seasons(plugin);
+        this.mysql = new MySQLDatabase(plugin);
 
         Console.info("", "=======================================");
         Console.info("", "Modules Loaded:");
@@ -38,39 +41,26 @@ public class Modules {
         // MESSAGES MODULE
         if (Config.isEnabled("messages")) {
             messages.enable();
-            Console.info("", "- Player/Broadcast Messages");
+            Console.info("", "- " + messages.getName());
         } else {
-            Console.severe("", "- Player/Broadcast Messages");
+            Console.severe("", "- " + messages.getName());
         }
 
         // SEASONS MODULE
         if (Config.isEnabled("seasons")) {
             seasons.enable();
             commands.add(seasons.getCommands().get());
-            Console.info("", "- CozySeasons");
+            Console.info("", "- " + seasons.getName());
         } else {
-            Console.severe("", "- CozySeasons");
-        }
-
-        // SQLITE MODULE
-        if (Config.isEnabled("sqlite")) {
-            Console.info("", "- SQLite Storage");
-        } else {
-            Console.severe("", "- SQLite Storage");
+            Console.severe("", "- " + seasons.getName());
         }
 
         // MYSQL MODULE
         if (Config.isEnabled("mysql")) {
-            Console.info("", "- MySQL Database");
+            mysql.enable();
+            Console.info("", "- " + mysql.getName());
         } else {
-            Console.severe("", "- MySQL Database");
-        }
-
-        // REDIS MODULE
-        if (Config.isEnabled("redis")) {
-            Console.info("", "- Redis/Cross-Server Syncing");
-        } else {
-            Console.severe("", "- Redis/Cross-Server Syncing");
+            Console.severe("", "- " + mysql.getName());
         }
 
         Console.info("", "=======================================");
@@ -83,6 +73,7 @@ public class Modules {
         console.disable();
         messages.disable();
         seasons.disable();
+        mysql.disable();
     }
 
     private void registerCommands() {

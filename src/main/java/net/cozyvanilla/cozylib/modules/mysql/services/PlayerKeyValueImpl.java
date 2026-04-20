@@ -2,8 +2,8 @@ package net.cozyvanilla.cozylib.modules.mysql.services;
 
 import net.cozyvanilla.cozylib.Enums;
 import net.cozyvanilla.cozylib.modules.messages.Console;
-import net.cozyvanilla.cozylib.modules.mysql.MySQLConnection;
-import net.cozyvanilla.cozylib.modules.mysql.MySQLTable;
+import net.cozyvanilla.cozylib.modules.mysql.MySQLDatabaseAPI;
+import net.cozyvanilla.cozylib.modules.mysql.abstracts.AbstractMySQLTable;
 import net.cozyvanilla.cozylib.modules.mysql.interfaces.PlayerKeyValueService;
 import org.jetbrains.annotations.NotNull;
 
@@ -20,13 +20,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-public class PlayerKeyValueImpl extends MySQLTable implements PlayerKeyValueService {
+public class PlayerKeyValueImpl extends AbstractMySQLTable implements PlayerKeyValueService {
     private final Set<String> dataList;
 
-    public PlayerKeyValueImpl(@NotNull String tableName,
-                              @NotNull MySQLConnection connection,
-                              @NotNull Set<String> dataList) {
-        super(connection, tableName);
+    public PlayerKeyValueImpl(@NotNull String tableName, @NotNull Set<String> dataList) {
+        super(tableName);
         this.dataList = dataList;
     }
 
@@ -52,7 +50,7 @@ public class PlayerKeyValueImpl extends MySQLTable implements PlayerKeyValueServ
         String selectQuery =
                 "SELECT data_name, amount FROM " + tableName + " WHERE player_uuid = ?";
 
-        try (Connection conn = connection.getConnection()) {
+        try (Connection conn = MySQLDatabaseAPI.getConnection()) {
             try (PreparedStatement insertStmt = conn.prepareStatement(insertMissingRows)) {
                 for (String data : dataList) {
                     insertStmt.setString(1, uuid.toString());
@@ -84,7 +82,7 @@ public class PlayerKeyValueImpl extends MySQLTable implements PlayerKeyValueServ
                 "INSERT INTO " + tableName + " (player_uuid, data_name, amount) VALUES (?, ?, ?) " +
                         "ON DUPLICATE KEY UPDATE amount = VALUES(amount)";
 
-        try (Connection conn = connection.getConnection();
+        try (Connection conn = MySQLDatabaseAPI.getConnection();
              PreparedStatement stmt = conn.prepareStatement(upsertQuery)) {
 
             for (Map.Entry<String, Integer> entry : data.entrySet()) {
@@ -109,7 +107,7 @@ public class PlayerKeyValueImpl extends MySQLTable implements PlayerKeyValueServ
                 "UPDATE " + tableName + " SET obtained_at = CURRENT_TIMESTAMP " +
                         "WHERE player_uuid = ? AND data_name = ? AND obtained_at IS NULL";
 
-        try (Connection conn = connection.getConnection()) {
+        try (Connection conn = MySQLDatabaseAPI.getConnection()) {
             try (PreparedStatement insertStmt = conn.prepareStatement(insertMissingRow)) {
                 insertStmt.setString(1, uuid.toString());
                 insertStmt.setString(2, dataName);
@@ -136,7 +134,7 @@ public class PlayerKeyValueImpl extends MySQLTable implements PlayerKeyValueServ
         String selectQuery =
                 "SELECT data_name, obtained_at FROM " + tableName + " WHERE player_uuid = ?";
 
-        try (Connection conn = connection.getConnection()) {
+        try (Connection conn = MySQLDatabaseAPI.getConnection()) {
             try (PreparedStatement insertStmt = conn.prepareStatement(insertMissingRows)) {
                 for (String data : dataList) {
                     insertStmt.setString(1, uuid.toString());
@@ -173,7 +171,7 @@ public class PlayerKeyValueImpl extends MySQLTable implements PlayerKeyValueServ
                         " ORDER BY obtained_at " + order.name() +
                         " LIMIT ?";
 
-        try (Connection conn = connection.getConnection();
+        try (Connection conn = MySQLDatabaseAPI.getConnection();
              PreparedStatement stmt = conn.prepareStatement(selectQuery)) {
 
             stmt.setString(1, dataName);
