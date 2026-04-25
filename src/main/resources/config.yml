@@ -17,6 +17,7 @@ modules:
   seasons: true
 
 integrations:
+  craft_engine: true
   world_guard: false
   excellent_economy: false
   skins_restorer: false

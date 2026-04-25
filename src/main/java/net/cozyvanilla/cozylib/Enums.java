@@ -106,4 +106,10 @@ public class Enums {
         ASC,
         DESC
     }
+
+    public enum PluginState {
+        NOT_INSTALLED,
+        INSTALLED_NOT_READY,
+        READY
+    }
 }

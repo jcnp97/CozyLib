@@ -33,7 +33,7 @@ repositories {
     }
     maven {
         name = "craft-engine"
-        url = "https://repo.momirealms.net/releases/"
+        url = "https://repo.momirealms.net/snapshots/"
     }
     maven {
         name 'codemc'
@@ -58,8 +58,9 @@ dependencies {
     compileOnly("su.nightexpress.coinsengine:CoinsEngine:2.7.0")
 
     //compileOnly("net.skinsrestorer:skinsrestorer-api:15.7.8")
-    //compileOnly("net.momirealms:craft-engine-core:0.0.64")
-    //compileOnly("net.momirealms:craft-engine-bukkit:0.0.64")
+    compileOnly("net.momirealms:craft-engine-core:26.4-SNAPSHOT")
+    compileOnly("net.momirealms:craft-engine-bukkit:26.4-SNAPSHOT")
+
     //compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.14")
 }
 
