@@ -60,7 +60,7 @@ public class EntityUtils {
     }
 
     /**
-     * Gets the nearest entity to a location within a maximum distance.
+     * Gets the nearest entity to a center-location within a maximum distance.
      *
      * @param location the location to search from
      * @param maxDistance the maximum search distance in blocks
@@ -70,15 +70,16 @@ public class EntityUtils {
     @Nullable
     public static Entity getNearest(@NotNull Location location, double maxDistance, @Nullable EntityType type) {
         if (location.getWorld() == null) return null;
+        Location center = location.clone().add(0.5, 0.5, 0.5);
 
         double maxDistanceSquared = maxDistance * maxDistance;
         Entity nearest = null;
         double nearestDistance = Double.MAX_VALUE;
 
-        for (Entity entity : location.getWorld().getNearbyEntities(location, maxDistance, maxDistance, maxDistance)) {
+        for (Entity entity : center.getWorld().getNearbyEntities(center, maxDistance, maxDistance, maxDistance)) {
             if (type != null && entity.getType() != type) continue;
 
-            double distanceSquared = entity.getLocation().distanceSquared(location);
+            double distanceSquared = entity.getLocation().distanceSquared(center);
             if (distanceSquared <= maxDistanceSquared && distanceSquared < nearestDistance) {
                 nearestDistance = distanceSquared;
                 nearest = entity;
@@ -86,6 +87,21 @@ public class EntityUtils {
         }
 
         return nearest;
+    }
+
+    /**
+     * Gets the nearest entity located within the same block as the given location.
+     *
+     * <p>This method searches using a radius of 0.9 blocks from the center of the
+     * specified location's block, which reliably includes entities within the same
+     * block space.</p>
+     *
+     * @param location the location to search from
+     * @param type the entity type to match, or null for any type
+     * @return the nearest matching entity within the same block, or null if none is found
+     */
+    public static Entity getNearest(@NotNull Location location, @Nullable EntityType type) {
+        return getNearest(location, 0.9, type);
     }
 
     /**
@@ -98,6 +114,20 @@ public class EntityUtils {
      */
     public static Entity getNearest(@NotNull Player player, double maxDistance, @Nullable EntityType type) {
         return getNearest(player.getLocation(), maxDistance, type);
+    }
+
+    /**
+     * Gets the nearest entity located within the same block as the player.
+     *
+     * <p>This method searches using a radius of 0.9 blocks from the center of the player's
+     * current block, which reliably includes entities within the same block space.</p>
+     *
+     * @param player the player to search from
+     * @param type the entity type to match, or null for any type
+     * @return the nearest matching entity within the player's block, or null if none is found
+     */
+    public static Entity getNearest(@NotNull Player player, @Nullable EntityType type) {
+        return getNearest(player.getLocation(), 0.9, type);
     }
 
     /**
