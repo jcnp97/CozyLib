@@ -104,22 +104,20 @@ public class Enums {
 
     public enum Ordering {
         ASC,
-        ASCENDING,
-        DESC,
-        DESCENDING;
+        DESC;
 
         public boolean isAscending() {
-            return this == ASC || this == ASCENDING;
+            return this == ASC;
         }
 
         public boolean isDescending() {
-            return this == DESC || this == DESCENDING;
+            return this == DESC;
         }
     }
 
     public enum PluginState {
         NOT_INSTALLED,
-        INSTALLED_NOT_READY,
-        READY
+        INSTALLED_NOT_LOADED,
+        LOADED
     }
 }

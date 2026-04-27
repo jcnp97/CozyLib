@@ -42,7 +42,7 @@ public class Modules {
         Console.info("<bold>---------------------------------------");
 
         // MESSAGES MODULE
-        if (Config.isEnabled("messages")) {
+        if (Config.hasModule("messages")) {
             messages.enable();
             Console.info("[+] " + messages.getName());
         } else {
@@ -50,7 +50,7 @@ public class Modules {
         }
 
         // SEASONS MODULE
-        if (Config.isEnabled("seasons")) {
+        if (Config.hasModule("seasons")) {
             seasons.enable();
             commands.add(seasons.getCommands().get());
             Console.info("[+] " + seasons.getName());
@@ -59,7 +59,7 @@ public class Modules {
         }
 
         // MYSQL MODULE
-        if (Config.isEnabled("mysql")) {
+        if (Config.hasModule("mysql")) {
             mysql.enable();
             Console.info("[+] " + mysql.getName());
         } else {
@@ -67,7 +67,7 @@ public class Modules {
         }
 
         // POLLS MODULE
-        if (Config.isEnabled("polls")) {
+        if (Config.hasModule("polls")) {
             polls.enable();
             commands.add(polls.getCommands().get());
             Console.info("[+] " + polls.getName());

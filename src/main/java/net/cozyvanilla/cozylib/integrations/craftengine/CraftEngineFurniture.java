@@ -1,7 +1,7 @@
 package net.cozyvanilla.cozylib.integrations.craftengine;
 
+import net.cozyvanilla.cozylib.modules.seasons.Seasons;
 import net.cozyvanilla.cozylib.utilities.bukkit.EntityUtils;
-import net.momirealms.craftengine.bukkit.api.CraftEngineFurniture;
 import net.momirealms.craftengine.bukkit.entity.furniture.BukkitFurniture;
 import net.momirealms.craftengine.core.entity.furniture.*;
 import net.momirealms.craftengine.core.item.Item;
@@ -13,18 +13,20 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 
-public class CraftEngineFurnitureUtils {
+public class CraftEngineFurniture {
 
-    private static BukkitFurniture placeFurniture(Location location, Key key, boolean sound) {
-        FurnitureDefinition furniture = CraftEngineFurniture.byId(key);
+    public CraftEngineFurniture() {}
+
+    private BukkitFurniture placeFurniture(Location location, Key key, boolean sound) {
+        FurnitureDefinition furniture = net.momirealms.craftengine.bukkit.api.CraftEngineFurniture.byId(key);
         if (furniture != null) {
-            return CraftEngineFurniture.place(location, key, furniture.anyVariantName(), sound);
+            return net.momirealms.craftengine.bukkit.api.CraftEngineFurniture.place(location, key, furniture.anyVariantName(), sound);
         }
 
         return null;
     }
 
-    private static void hasFurniture(Location location) {
+    private void hasFurniture(Location location) {
         Entity entity = EntityUtils.getNearest(location, null);
         if (entity != null) {
             throw new IllegalArgumentException("Failed to place a CraftEngine furniture because the location has an existing entity!");
@@ -32,11 +34,11 @@ public class CraftEngineFurnitureUtils {
     }
 
     @Nullable
-    private static BukkitFurniture getFurnitureFromEntity(@NotNull Entity entity) {
-        return CraftEngineFurniture.getLoadedFurnitureByMetaEntity(entity);
+    private BukkitFurniture getFurnitureFromEntity(@NotNull Entity entity) {
+        return net.momirealms.craftengine.bukkit.api.CraftEngineFurniture.getLoadedFurnitureByMetaEntity(entity);
     }
 
-    private static boolean setColor(Entity entity, Color color) {
+    private boolean setColor(Entity entity, Color color) {
         BukkitFurniture furniture = getFurnitureFromEntity(entity);
         if (furniture == null) { return false; }
 
@@ -53,8 +55,7 @@ public class CraftEngineFurnitureUtils {
 
     // public API
     @Nullable
-    public static Entity place(Location location, Key key, boolean sound) {
-        CraftEngine.requireReady();
+    public Entity place(Location location, Key key, boolean sound) {
         hasFurniture(location);
 
         BukkitFurniture furniture = placeFurniture(location, key, sound);
@@ -65,20 +66,19 @@ public class CraftEngineFurnitureUtils {
         return null;
     }
 
-    public static boolean remove(Entity entity) {
-        CraftEngine.requireReady();
-        if (CraftEngineFurniture.isFurniture(entity)) {
-            return CraftEngineFurniture.remove(entity);
+    public boolean remove(Entity entity) {
+        if (net.momirealms.craftengine.bukkit.api.CraftEngineFurniture.isFurniture(entity)) {
+            return net.momirealms.craftengine.bukkit.api.CraftEngineFurniture.remove(entity);
         }
 
         return false;
     }
 
-    public static boolean setColorFromHex(Entity entity, String hex) {
-        return setColor(entity, CraftEngineColorUtils.fromHex(hex));
+    public boolean setColorFromHex(Entity entity, String hex) {
+        return setColor(entity, CraftEngine.util().fromHex(hex));
     }
 
-    public static boolean setColorFromRGB(Entity entity, String rgb) {
-        return setColor(entity, CraftEngineColorUtils.fromRGB(rgb));
+    public boolean setColorFromRGB(Entity entity, String rgb) {
+        return setColor(entity, CraftEngine.util().fromRGB(rgb));
     }
 }

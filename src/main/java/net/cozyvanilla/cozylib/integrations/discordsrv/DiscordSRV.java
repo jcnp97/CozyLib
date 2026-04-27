@@ -1,32 +1,25 @@
-package net.cozyvanilla.cozylib.integrations.craftengine;
+package net.cozyvanilla.cozylib.integrations.discordsrv;
 
+import github.scarsz.discordsrv.api.Subscribe;
+import github.scarsz.discordsrv.api.events.DiscordReadyEvent;
 import net.cozyvanilla.cozylib.Enums;
 import net.cozyvanilla.cozylib.integrations.Integration;
 import net.cozyvanilla.cozylib.modules.messages.Console;
 import net.cozyvanilla.cozylib.utilities.bukkit.PluginUtils;
-import net.momirealms.craftengine.bukkit.api.event.CraftEngineReloadEvent;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 
-public final class CraftEngine implements Listener, Integration {
-    private final Plugin plugin;
+public final class DiscordSRV implements Integration {
 
     // static
-    private static final String pluginName = "CraftEngine";
+    private static final String pluginName = "DiscordSRV";
     private static Enums.PluginState state;
     private static File directory;
 
-    private static CraftEngineFurniture furniture;
-    private static CraftEngineItem item;
-    private static CraftEngineUtil util;
+    private static DiscordSRVUtil util;
 
-    public CraftEngine(@NotNull Plugin plugin) {
-        this.plugin = plugin;
-    }
+    public DiscordSRV() {}
 
     @Override
     public String getName() {
@@ -35,15 +28,15 @@ public final class CraftEngine implements Listener, Integration {
 
     @Override
     public void enable() {
-        Plugin craftEngine = PluginUtils.getPlugin(getName());
-        if (craftEngine == null) {
+        Plugin discordSRV = PluginUtils.getPlugin(getName());
+        if (discordSRV == null) {
             Console.severe(pluginName + " not found! Disabling integration..");
             return;
         }
 
         state = Enums.PluginState.INSTALLED_NOT_LOADED;
         directory = PluginUtils.getDirectory(getName());
-        plugin.getServer().getPluginManager().registerEvents(this, plugin);
+        github.scarsz.discordsrv.DiscordSRV.api.subscribe(this);
     }
 
     @Override
@@ -56,19 +49,15 @@ public final class CraftEngine implements Listener, Integration {
         if (state == Enums.PluginState.LOADED) return;
 
         // load APIs
-        furniture = new CraftEngineFurniture();
-        item = new CraftEngineItem();
-        util = new CraftEngineUtil();
+        util = new DiscordSRVUtil();
 
         // change into load state
         state = Enums.PluginState.LOADED;
     }
 
-    @EventHandler
-    public void onCraftEngineReload(CraftEngineReloadEvent e) {
-        if (e.isFirstReload()) {
-            load();
-        }
+    @Subscribe
+    public void onDiscordReady(DiscordReadyEvent e) {
+        load();
     }
 
     private static void require() {
@@ -90,17 +79,7 @@ public final class CraftEngine implements Listener, Integration {
         return directory;
     }
 
-    public static CraftEngineFurniture furniture() {
-        require();
-        return furniture;
-    }
-
-    public static CraftEngineItem item() {
-        require();
-        return item;
-    }
-
-    public static CraftEngineUtil util() {
+    public static DiscordSRVUtil util() {
         require();
         return util;
     }

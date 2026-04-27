@@ -66,7 +66,10 @@ public class Config {
 
     public static Map<String, Boolean> getIntegrations() { return integrations; }
 
-    public static boolean isEnabled(String module) {
+    public static boolean hasModule(String module) {
         return modules.getOrDefault(module, false);
+    }
+    public static boolean hasIntegration(String module) {
+        return integrations.getOrDefault(module, false);
     }
 }

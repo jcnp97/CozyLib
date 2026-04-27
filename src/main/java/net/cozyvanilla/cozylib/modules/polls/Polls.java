@@ -3,7 +3,8 @@ package net.cozyvanilla.cozylib.modules.polls;
 import github.scarsz.discordsrv.dependencies.jda.api.EmbedBuilder;
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import net.cozyvanilla.cozylib.Enums;
-import net.cozyvanilla.cozylib.integrations.discordsrv.DiscordSRVAPI;
+import net.cozyvanilla.cozylib.integrations.discordsrv.DiscordSRV;
+import net.cozyvanilla.cozylib.integrations.discordsrv.DiscordSRVUtil;
 import net.cozyvanilla.cozylib.modules.Module;
 import net.cozyvanilla.cozylib.services.files.JsonFileReader;
 import net.cozyvanilla.cozylib.services.files.JsonFileWriter;
@@ -133,7 +134,7 @@ public final class Polls implements Module<PollsCommands> {
 
     private List<String> generateFields(double sum, boolean hasEnded) {
         List<String> fields = new ArrayList<>();
-        String timestamp = DiscordSRVAPI.getTimestamp(expiresAt);
+        String timestamp = DiscordSRV.util().getTimestamp(expiresAt);
         String winner = null;
 
         for (Map.Entry<String, Double> entry : polls.entrySet()) {
@@ -167,7 +168,7 @@ public final class Polls implements Module<PollsCommands> {
             color = "#FF5555";
         }
 
-        return DiscordSRVAPI.getEmbedMessage(
+        return DiscordSRV.util().getEmbedMessage(
                 "Which content would you like to see on the next update?",
                 null,
                 ColorUtils.fromHex(color),
@@ -189,11 +190,11 @@ public final class Polls implements Module<PollsCommands> {
     public void sendToDiscord(boolean hasEnded) {
         // delete last post
         if (lastMessageId != null) {
-            DiscordSRVAPI.deleteMessage(channelId, lastMessageId);
+            DiscordSRV.util().deleteMessage(channelId, lastMessageId);
         }
 
         // create new post
-        DiscordSRVAPI.sendEmbedMessage(channelId, createEmbed(hasEnded))
+        DiscordSRV.util().sendEmbedMessage(channelId, createEmbed(hasEnded))
                 .thenAccept(messageId -> {
                     lastMessageId = messageId;
                     AsyncUtils.async(plugin, () -> {
