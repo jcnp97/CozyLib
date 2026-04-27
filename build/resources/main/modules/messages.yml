@@ -1,0 +1,20 @@
+color:
+  info: "<#77DD77>"
+  warning: "<#FFD580>"
+  severe: "<#FF6961>"
+  notification: "<#FFFACD>"
+  broadcast: "<gradient:#EBD197:#B48811>"
+
+icon:
+  info: ""
+  warning: ""
+  severe: ""
+  notification: ""
+  broadcast: ""
+
+sound:
+  info: ""
+  warning: ""
+  severe: ""
+  notification: ""
+  broadcast: ""

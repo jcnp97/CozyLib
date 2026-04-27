@@ -1,0 +1,4 @@
+color:
+  info: "<green>"
+  warning: "<yellow>"
+  severe: "<red>"

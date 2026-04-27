@@ -1,0 +1,27 @@
+plugin:
+  prefix: "[CozyLib]"
+  command_prefix: "cozy"
+
+redis:
+  host: 127.0.0.1
+  port: 6379
+  username: default
+  password: password
+  ssl: false
+
+modules:
+  messages: true
+  sqlite: true
+  mysql: true
+  redis: false
+  seasons: true
+  polls: true
+
+integrations:
+  craft_engine: true
+  discord_srv: true
+  world_guard: false
+  excellent_economy: false
+  skins_restorer: false
+  better_model: false
+  packet_events: false

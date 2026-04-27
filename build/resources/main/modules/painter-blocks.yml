@@ -1,0 +1,40 @@
+whitelist:
+  materials:
+    - "OAK_PLANKS"
+    - "SPRUCE_PLANKS"
+    - "BIRCH_PLANKS"
+    - "JUNGLE_PLANKS"
+    - "ACACIA_PLANKS"
+    - "DARK_OAK_PLANKS"
+    - "MANGROVE_PLANKS"
+    - "CHERRY_PLANKS"
+    - "BAMBOO_PLANKS"
+    - "CRIMSON_PLANKS"
+    - "WARPED_PLANKS"
+    - "PALE_OAK_PLANKS"
+    - "BAMBOO_MOSAIC"
+    - "BAMBOO_PLANKS"
+    - "BRICKS"
+    - "GLOWSTONE"
+    - "MUD_BRICKS"
+    - "NETHER_BRICKS"
+    - "SMOOTH_STONE"
+    - "STONE_BRICKS"
+
+colors:
+  black: 0,0,0
+  white: 255,255,255
+  blue: 60,68,170
+  cyan: 21,137,145
+  brown: 131,84,50
+  gray: 62,68,71
+  green: 73,91,36
+  light_blue: 58,179,218
+  light_gray: 142,142,134
+  lime: 112,185,25
+  magenta: 189,68,179
+  orange: 249,128,29
+  pink: 237,141,172
+  purple: 137,50,184
+  red: 176,46,38
+  yellow: 254,216,61

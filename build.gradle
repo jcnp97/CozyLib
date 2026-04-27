@@ -43,6 +43,10 @@ repositories {
         name 'nightexpress'
         url 'https://repo.nightexpressdev.com/releases'
     }
+    maven {
+        name 'discordsrv'
+        url 'https://nexus.scarsz.me/content/groups/public/'
+    }
 }
 
 dependencies {
@@ -56,6 +60,7 @@ dependencies {
     compileOnly("io.github.toxicity188:bettermodel-bukkit-api:2.2.0")
     compileOnly("org.xerial:sqlite-jdbc:3.49.1.0")
     compileOnly("su.nightexpress.coinsengine:CoinsEngine:2.7.0")
+    compileOnly 'com.discordsrv:discordsrv:1.30.5'
 
     //compileOnly("net.skinsrestorer:skinsrestorer-api:15.7.8")
     compileOnly("net.momirealms:craft-engine-core:26.4-SNAPSHOT")
