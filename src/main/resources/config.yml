@@ -15,9 +15,11 @@ modules:
   mysql: true
   redis: false
   seasons: true
+  polls: true
 
 integrations:
   craft_engine: true
+  discord_srv: true
   world_guard: false
   excellent_economy: false
   skins_restorer: false

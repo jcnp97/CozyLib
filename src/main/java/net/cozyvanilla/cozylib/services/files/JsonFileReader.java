@@ -7,6 +7,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class JsonFileReader {
 
@@ -188,6 +190,32 @@ public class JsonFileReader {
     public @Nullable JsonArray getArray(@NotNull String path) {
         JsonElement e = getElement(path);
         return (e != null && e.isJsonArray()) ? e.getAsJsonArray() : null;
+    }
+
+    /**
+     * Retrieves a map of String keys to Double values from a JSON object at the given path.
+     * Only valid numeric primitive values are included; invalid entries are ignored.
+     *
+     * @param path the path to the JSON object
+     * @return a map of parsed double values, or null if the object does not exist
+     */
+    public @Nullable Map<String, Double> getDoubleMap(@NotNull String path) {
+        JsonObject object = getObject(path);
+        if (object == null) return null;
+
+        Map<String, Double> values = new LinkedHashMap<>();
+
+        for (Map.Entry<String, JsonElement> entry : object.entrySet()) {
+            JsonElement value = entry.getValue();
+
+            if (!value.isJsonPrimitive()) continue;
+            try {
+                values.put(entry.getKey(), value.getAsDouble());
+            } catch (Exception ignored) {
+            }
+        }
+
+        return values;
     }
 
     /**

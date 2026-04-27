@@ -1,6 +1,5 @@
 package net.cozyvanilla.cozylib.utilities.paper;
 
-import net.cozyvanilla.cozylib.CozyLib;
 import net.cozyvanilla.cozylib.modules.messages.Console;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;

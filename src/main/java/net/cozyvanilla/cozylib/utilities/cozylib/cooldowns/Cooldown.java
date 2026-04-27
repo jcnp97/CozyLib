@@ -1,16 +1,30 @@
 package net.cozyvanilla.cozylib.utilities.cozylib.cooldowns;
 
-import java.util.Map;
+import net.cozyvanilla.cozylib.utilities.java.PerEntryExpiryCache;
+
+import java.time.Duration;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 public final class Cooldown {
-    private static final Map<String, Long> EXPIRY_TIMESTAMPS = new ConcurrentHashMap<>();
+
+    /**
+     * Utility class for handling named cooldowns per owner, player, and id.
+     */
+    private static final PerEntryExpiryCache<String, Long> EXPIRY_TIMESTAMPS =
+            PerEntryExpiryCache.create(10_000, key -> Duration.ofSeconds(60));
 
     private Cooldown() {}
 
-    private static String key(Class<?> owner, UUID uuid, String id) {
+    /**
+     * Builds a unique cooldown key from the owner class, player UUID, and cooldown id.
+     *
+     * @param owner class that owns the cooldown
+     * @param uuid player UUID
+     * @param id cooldown identifier
+     * @return unique cache key for the cooldown
+     */
+    private static String keyOf(Class<?> owner, UUID uuid, String id) {
         Objects.requireNonNull(owner, "owner");
         Objects.requireNonNull(uuid, "uuid");
         Objects.requireNonNull(id, "id");
@@ -18,42 +32,92 @@ public final class Cooldown {
         return owner.getName() + ":" + uuid + ":" + id;
     }
 
-    public static void add(Class<?> owner, UUID uuid, String id, long seconds) {
+    /**
+     * Stores a cooldown entry using the given key and duration.
+     *
+     * @param key unique cooldown key
+     * @param seconds cooldown duration in seconds
+     */
+    private static void add(String key, long seconds) {
+        long future = System.currentTimeMillis() + (seconds * 1000L);
+        EXPIRY_TIMESTAMPS.put(key, future, Duration.ofSeconds(seconds));
+    }
+
+    /**
+     * Starts a cooldown for the given owner, player, and id.
+     *
+     * @param owner class that owns the cooldown
+     * @param uuid player UUID
+     * @param id cooldown identifier
+     * @param seconds cooldown duration in seconds
+     * @throws IllegalArgumentException if seconds is not greater than 0
+     */
+    public static void start(Class<?> owner, UUID uuid, String id, long seconds) {
         if (seconds <= 0) {
             throw new IllegalArgumentException("seconds must be greater than 0");
         }
 
-        long expiresAt = System.currentTimeMillis() + (seconds * 1000L);
-        EXPIRY_TIMESTAMPS.put(key(owner, uuid, id), expiresAt);
+        add(keyOf(owner, uuid, id), seconds);
     }
 
-    public static boolean tryAdd(Class<?> owner, UUID uuid, String id, long seconds) {
-        String token = key(owner, uuid, id);
-        long now = System.currentTimeMillis();
-        long expiresAt = EXPIRY_TIMESTAMPS.getOrDefault(token, 0L);
-
-        if (expiresAt > now) {
-            return false;
+    /**
+     * Starts a cooldown only if one is not already active.
+     *
+     * @param owner class that owns the cooldown
+     * @param uuid player UUID
+     * @param id cooldown identifier
+     * @param seconds cooldown duration in seconds
+     * @return true if the cooldown was started, false if already active or invalid
+     */
+    public static boolean tryStart(Class<?> owner, UUID uuid, String id, long seconds) {
+        if (seconds <= 0) {
+            throw new IllegalArgumentException("seconds must be greater than 0");
         }
 
-        EXPIRY_TIMESTAMPS.put(token, now + (seconds * 1000L));
-        return true;
+        String key = keyOf(owner, uuid, id);
+        Long expiresAt = EXPIRY_TIMESTAMPS.getIfPresent(key);
+        if (expiresAt == null) {
+            start(owner, uuid, id, seconds);
+            return true;
+        }
+
+        return false;
     }
 
+    /**
+     * Gets the remaining cooldown time in seconds.
+     *
+     * @param owner class that owns the cooldown
+     * @param uuid player UUID
+     * @param id cooldown identifier
+     * @return remaining time in seconds, or 0 if no cooldown exists
+     */
     public static long get(Class<?> owner, UUID uuid, String id) {
-        String token = key(owner, uuid, id);
-        long expiresAt = EXPIRY_TIMESTAMPS.getOrDefault(token, 0L);
-        long remainingMillis = expiresAt - System.currentTimeMillis();
-
-        if (remainingMillis <= 0) {
-            EXPIRY_TIMESTAMPS.remove(token);
-            return 0;
-        }
-
-        return Math.max(1, (remainingMillis + 999) / 1000);
+        Long expiresAt = EXPIRY_TIMESTAMPS.getIfPresent(keyOf(owner, uuid, id));
+        return expiresAt == null ? 0L : ((expiresAt - System.currentTimeMillis()) / 1000);
     }
 
-    public static void clear(Class<?> owner, UUID uuid, String id) {
-        EXPIRY_TIMESTAMPS.remove(key(owner, uuid, id));
+    /**
+     * Gets the remaining cooldown time in seconds, or starts a new cooldown if none is active.
+     *
+     * @param owner class that owns the cooldown
+     * @param uuid player UUID
+     * @param id cooldown identifier
+     * @param seconds cooldown duration in seconds
+     * @return remaining seconds, 0 if a new cooldown was started
+     */
+    public static long getOrStart(Class<?> owner, UUID uuid, String id, long seconds) {
+        if (seconds <= 0) {
+            throw new IllegalArgumentException("seconds must be greater than 0");
+        }
+
+        String key = keyOf(owner, uuid, id);
+        Long expiresAt = EXPIRY_TIMESTAMPS.getIfPresent(key);
+        if (expiresAt != null) {
+            return get(owner, uuid, id);
+        }
+
+        start(owner, uuid, id, seconds);
+        return 0;
     }
 }

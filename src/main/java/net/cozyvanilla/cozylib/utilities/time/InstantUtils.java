@@ -2,10 +2,15 @@ package net.cozyvanilla.cozylib.utilities.time;
 
 import net.cozyvanilla.cozylib.Enums;
 
+import javax.annotation.Nullable;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 public class InstantUtils {
+    private static final DateTimeFormatter FORMATTER =
+            DateTimeFormatter.ofPattern("MMMM dd, yyyy | h:mm a", Locale.ENGLISH);
 
     /**
      * Gets the current timestamp as an {@link Instant}.
@@ -63,7 +68,11 @@ public class InstantUtils {
      * @param time the instant to convert
      * @return formatted string
      */
-    public static String toString(Instant time) { return DateTimeFormatter.ISO_INSTANT.format(time); }
+    @Nullable
+    public static String toString(Instant time) {
+        if (time == null) { return null;}
+        return DateTimeFormatter.ISO_INSTANT.format(time);
+    }
 
     /**
      * Parses an ISO-8601 string into an {@link Instant}.
@@ -71,5 +80,31 @@ public class InstantUtils {
      * @param time the string to parse
      * @return parsed instant
      */
-    public static Instant toInstant(String time) { return Instant.parse(time); }
+    @Nullable
+    public static Instant toInstant(String time) {
+        if (time == null) { return null;}
+        return Instant.parse(time);
+    }
+
+    /**
+     * Converts an {@link Instant} into a formatted readable string using the given time zone.
+     *
+     * @param time the Instant to format
+     * @param timeZone the time zone ID (e.g., "America/New_York")
+     * @return formatted date-time string, or null if input is invalid or timezone is invalid
+     */
+    @Nullable
+    public static String toReadable(Instant time, String timeZone) {
+        if (time == null || timeZone == null || timeZone.isEmpty()) {
+            return null;
+        }
+
+        try {
+            ZoneId zoneId = ZoneId.of(timeZone);
+            return FORMATTER.format(time.atZone(zoneId));
+        } catch (Exception e) {
+            // invalid timezone
+            return null;
+        }
+    }
 }

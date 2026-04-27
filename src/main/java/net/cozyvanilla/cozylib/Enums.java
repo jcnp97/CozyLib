@@ -104,7 +104,17 @@ public class Enums {
 
     public enum Ordering {
         ASC,
-        DESC
+        ASCENDING,
+        DESC,
+        DESCENDING;
+
+        public boolean isAscending() {
+            return this == ASC || this == ASCENDING;
+        }
+
+        public boolean isDescending() {
+            return this == DESC || this == DESCENDING;
+        }
     }
 
     public enum PluginState {
