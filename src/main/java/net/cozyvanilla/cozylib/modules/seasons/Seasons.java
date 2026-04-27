@@ -70,7 +70,7 @@ public final class Seasons implements Module<SeasonsCommands> {
         SeasonsAPI.register(this);
 
         // Read configs
-        YamlFileReader config = new YamlFileReader(plugin, "modules/seasons.yml");
+        YamlFileReader config = new YamlFileReader(plugin, "modules/seasons/config.yml");
         timeZone = config.get().getString("time_zone");
         springMessage = config.get().getString("messages.spring");
         summerMessage = config.get().getString("messages.summer");
@@ -83,7 +83,7 @@ public final class Seasons implements Module<SeasonsCommands> {
         }
 
         // Write into seasons.json, does not overwrite
-        JsonFileWriter writer = new JsonFileWriter(plugin, "caches/seasons.json");
+        JsonFileWriter writer = new JsonFileWriter(plugin, "modules/seasons/seasons.json");
         Instant now = InstantUtils.now();
         writer.writeString("date_started", InstantUtils.toString(now), false);
 
@@ -116,7 +116,7 @@ public final class Seasons implements Module<SeasonsCommands> {
     }
 
     public void reset() {
-        JsonFileWriter writer = new JsonFileWriter(plugin, "caches/seasons.json");
+        JsonFileWriter writer = new JsonFileWriter(plugin, "modules/seasons/seasons.json");
         String dateStarted = InstantUtils.toString(InstantUtils.now());
         writer.writeString("date_started", dateStarted, true);
 
