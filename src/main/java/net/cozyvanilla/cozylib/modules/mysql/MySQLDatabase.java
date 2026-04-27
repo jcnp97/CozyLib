@@ -34,9 +34,7 @@ public final class MySQLDatabase implements Module<Void> {
     }
 
     @Override
-    public void enable() {
-        MySQLDatabaseAPI.register(this);
-
+    public void getConfig() {
         YamlFileReader file = new YamlFileReader(plugin, "modules/mysql-database.yml");
         hikariDataSource = getHikari(
                 file.get().getString("mysql.pool_name"),
@@ -46,6 +44,12 @@ public final class MySQLDatabase implements Module<Void> {
                 file.get().getString("mysql.password"),
                 file.get().getString("mysql.database")
         );
+    }
+
+    @Override
+    public void enable() {
+        MySQLDatabaseAPI.register(this);
+        getConfig();
     }
 
     @Override

@@ -7,6 +7,7 @@ import net.cozyvanilla.cozylib.integrations.discordsrv.DiscordSRVAPI;
 import net.cozyvanilla.cozylib.modules.Module;
 import net.cozyvanilla.cozylib.services.files.JsonFileReader;
 import net.cozyvanilla.cozylib.services.files.JsonFileWriter;
+import net.cozyvanilla.cozylib.services.files.YamlFileReader;
 import net.cozyvanilla.cozylib.utilities.java.ColorUtils;
 import net.cozyvanilla.cozylib.utilities.java.HashMapUtils;
 import net.cozyvanilla.cozylib.utilities.numbers.DecimalUtils;
@@ -26,12 +27,16 @@ public final class Polls implements Module<PollsCommands> {
     private final Plugin plugin;
 
     private final Map<String, Double> polls = new LinkedHashMap<>();
-    private final String channel = "1498210275013296199";
 
     private JsonFileWriter writer;
     private Instant expiresAt;
     private String lastMessageId;
     private ScheduledTask task;
+
+    // configs
+    private String channelId;
+    private double updateInterval;
+    private int progressBarLength;
 
     public Polls(Plugin plugin) {
         this.plugin = plugin;
@@ -54,14 +59,23 @@ public final class Polls implements Module<PollsCommands> {
     }
 
     @Override
+    public void getConfig() {
+        YamlFileReader config = new YamlFileReader(plugin, "modules/polls/config.yml");
+        channelId = config.get().getString("channel_id");
+        updateInterval = config.get().getDouble("update_interval");
+        progressBarLength = config.get().getInt("progress_bar_length");
+    }
+
+    @Override
     public void enable() {
         //PollsAPI.register(this);
+        getConfig();
 
         JsonFileReader reader = new JsonFileReader(plugin, "modules/polls/storage.json");
         File file = reader.getFile();
         writer = new JsonFileWriter(plugin, file);
 
-        // read cache
+        // read storage cache
         expiresAt = InstantUtils.toInstant(reader.getString("expirestAt"));
         lastMessageId = reader.getString("lastMessageId");
         Map<String, Double> pollsFromFile = reader.getDoubleMap("polls");
@@ -70,7 +84,7 @@ public final class Polls implements Module<PollsCommands> {
         }
 
         // run task every 5 minutes
-        task = TaskUtils.repeating(plugin, this::task, 300.0);
+        task = TaskUtils.repeating(plugin, this::task, updateInterval);
     }
 
     @Override
@@ -127,7 +141,7 @@ public final class Polls implements Module<PollsCommands> {
             double value = entry.getValue();
 
             double progress = DecimalUtils.format((value / sum) * 100.0);
-            String bar = getProgress(progress, 12);
+            String bar = getProgress(progress, progressBarLength);
             fields.add(pollName + ";" + bar + " " + progress + "%;false");
 
             if (winner == null) {
@@ -175,11 +189,11 @@ public final class Polls implements Module<PollsCommands> {
     public void sendToDiscord(boolean hasEnded) {
         // delete last post
         if (lastMessageId != null) {
-            DiscordSRVAPI.deleteMessage(channel, lastMessageId);
+            DiscordSRVAPI.deleteMessage(channelId, lastMessageId);
         }
 
         // create new post
-        DiscordSRVAPI.sendEmbedMessage(channel, createEmbed(hasEnded))
+        DiscordSRVAPI.sendEmbedMessage(channelId, createEmbed(hasEnded))
                 .thenAccept(messageId -> {
                     lastMessageId = messageId;
                     AsyncUtils.async(plugin, () -> {

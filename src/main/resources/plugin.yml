@@ -1,0 +1,6 @@
+name: CozyLib
+version: '${version}'
+
+main: net.cozyvanilla.cozylib.CozyLib
+api-version: '26.1.1'
+load: POSTWORLD

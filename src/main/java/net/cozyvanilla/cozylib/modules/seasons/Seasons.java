@@ -66,10 +66,7 @@ public final class Seasons implements Module<SeasonsCommands> {
     }
 
     @Override
-    public void enable() {
-        SeasonsAPI.register(this);
-
-        // Read configs
+    public void getConfig() {
         YamlFileReader config = new YamlFileReader(plugin, "modules/seasons/config.yml");
         timeZone = config.get().getString("time_zone");
         springMessage = config.get().getString("messages.spring");
@@ -81,9 +78,15 @@ public final class Seasons implements Module<SeasonsCommands> {
         for (Map.Entry<Integer, String> entry : schedule.entrySet()) {
             seasonSchedule.put(entry.getKey(), Enums.Seasons.valueOf(entry.getValue()));
         }
+    }
 
-        // Write into seasons.json, does not overwrite
-        JsonFileWriter writer = new JsonFileWriter(plugin, "modules/seasons/seasons.json");
+    @Override
+    public void enable() {
+        SeasonsAPI.register(this);
+        getConfig();
+
+        // Write into storage.json, does not overwrite
+        JsonFileWriter writer = new JsonFileWriter(plugin, "modules/seasons/storage.json");
         Instant now = InstantUtils.now();
         writer.writeString("date_started", InstantUtils.toString(now), false);
 
@@ -116,7 +119,7 @@ public final class Seasons implements Module<SeasonsCommands> {
     }
 
     public void reset() {
-        JsonFileWriter writer = new JsonFileWriter(plugin, "modules/seasons/seasons.json");
+        JsonFileWriter writer = new JsonFileWriter(plugin, "modules/seasons/storage.json");
         String dateStarted = InstantUtils.toString(InstantUtils.now());
         writer.writeString("date_started", dateStarted, true);
 

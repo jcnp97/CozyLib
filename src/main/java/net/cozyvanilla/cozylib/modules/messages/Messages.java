@@ -41,9 +41,8 @@ public final class Messages implements Module<Void> {
     }
 
     @Override
-    public void enable() {
+    public void getConfig() {
         YamlFileReader file = new YamlFileReader(plugin, "modules/messages.yml");
-
         colors = new Colors(
                 file.get().getString("color.info"),
                 file.get().getString("color.warning"),
@@ -67,6 +66,11 @@ public final class Messages implements Module<Void> {
                 file.get().getString("sound.notification"),
                 file.get().getString("sound.broadcast")
         );
+    }
+
+    @Override
+    public void enable() {
+        getConfig();
     }
 
     @Override

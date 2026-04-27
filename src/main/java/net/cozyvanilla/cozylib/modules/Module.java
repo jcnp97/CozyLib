@@ -7,6 +7,7 @@ public interface Module<T> {
     String getPrefix();
     @Nullable
     T getCommands();
+    void getConfig();
     void enable();
     void disable();
 }

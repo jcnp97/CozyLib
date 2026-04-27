@@ -38,13 +38,18 @@ public final class Console implements Module<Void> {
     }
 
     @Override
-    public void enable() {
+    public void getConfig() {
         YamlFileReader file = new YamlFileReader(plugin, "modules/console.yml");
         messageType = new MessageType(
                 file.get().getString("color.info"),
                 file.get().getString("color.warning"),
                 file.get().getString("color.severe")
         );
+    }
+
+    @Override
+    public void enable() {
+        getConfig();
     }
 
     @Override
