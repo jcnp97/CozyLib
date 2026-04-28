@@ -3,6 +3,7 @@ package net.cozyvanilla.cozylib.integrations;
 import net.cozyvanilla.cozylib.Config;
 import net.cozyvanilla.cozylib.integrations.craftengine.CraftEngine;
 import net.cozyvanilla.cozylib.integrations.discordsrv.DiscordSRV;
+import net.cozyvanilla.cozylib.integrations.economy.ExcellentEconomy;
 import net.cozyvanilla.cozylib.modules.messages.Console;
 import org.bukkit.plugin.Plugin;
 
@@ -11,6 +12,7 @@ public class Integrations {
 
     private CraftEngine craftEngine;
     private DiscordSRV discordSRV;
+    private ExcellentEconomy excellentEconomy;
 
     public Integrations(Plugin plugin) {
         this.plugin = plugin;
@@ -21,6 +23,7 @@ public class Integrations {
         // integrations are always registered regardless of enable/disable status
         this.craftEngine = new CraftEngine(plugin);
         this.discordSRV = new DiscordSRV();
+        this.excellentEconomy = new ExcellentEconomy();
 
         Console.info("");
         Console.info("<bold>Integrations Loaded:");
@@ -42,11 +45,20 @@ public class Integrations {
             Console.severe("[-] " + discordSRV.getName());
         }
 
+        // EXE_ECO
+        if (Config.hasIntegration("excellent_economy")) {
+            excellentEconomy.enable();
+            Console.info("[+] " + excellentEconomy.getName());
+        } else {
+            Console.severe("[-] " + excellentEconomy.getName());
+        }
+
         Console.info("<bold>---------------------------------------");
     }
 
     public void disable() {
         craftEngine.disable();
         discordSRV.disable();
+        excellentEconomy.disable();
     }
 }

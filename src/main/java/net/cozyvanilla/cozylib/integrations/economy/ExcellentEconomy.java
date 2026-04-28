@@ -1,25 +1,28 @@
-package net.cozyvanilla.cozylib.integrations.discordsrv;
+package net.cozyvanilla.cozylib.integrations.economy;
 
-import github.scarsz.discordsrv.api.Subscribe;
-import github.scarsz.discordsrv.api.events.DiscordReadyEvent;
 import net.cozyvanilla.cozylib.Enums;
 import net.cozyvanilla.cozylib.integrations.Integration;
 import net.cozyvanilla.cozylib.modules.messages.Console;
 import net.cozyvanilla.cozylib.utilities.bukkit.PluginUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.RegisteredServiceProvider;
+import su.nightexpress.excellenteconomy.api.ExcellentEconomyAPI;
 
 import java.io.File;
 
-public final class DiscordSRV implements Integration {
+public final class ExcellentEconomy implements Integration {
 
     // static
-    private static final String pluginName = "DiscordSRV";
+    private static final String pluginName = "ExcellentEconomy";
     private static Enums.PluginState state;
     private static File directory;
 
-    private static DiscordSRVUtil util;
+    private static ExcellentEconomyGet get;
+    private static ExcellentEconomyDeposit deposit;
+    private static ExcellentEconomyWithdraw withdraw;
 
-    public DiscordSRV() {}
+    public ExcellentEconomy() {}
 
     @Override
     public String getName() {
@@ -36,7 +39,6 @@ public final class DiscordSRV implements Integration {
 
         state = Enums.PluginState.INSTALLED_NOT_LOADED;
         directory = PluginUtils.getDirectory(getName());
-        github.scarsz.discordsrv.DiscordSRV.api.subscribe(this);
     }
 
     @Override
@@ -48,16 +50,15 @@ public final class DiscordSRV implements Integration {
     public void load() {
         if (state == Enums.PluginState.LOADED) return;
 
-        // load APIs
-        util = new DiscordSRVUtil();
+        RegisteredServiceProvider<ExcellentEconomyAPI> provider = Bukkit.getServer().getServicesManager().getRegistration(ExcellentEconomyAPI.class);
+        if (provider != null) {
+            ExcellentEconomyAPI api = provider.getProvider();
+            // load APIs
+            get = new ExcellentEconomyGet(api);
 
-        // change into load state
-        state = Enums.PluginState.LOADED;
-    }
-
-    @Subscribe
-    public void onDiscordReady(DiscordReadyEvent e) {
-        load();
+            // change into load state
+            state = Enums.PluginState.LOADED;
+        }
     }
 
     private static void require() {
@@ -79,8 +80,18 @@ public final class DiscordSRV implements Integration {
         return directory;
     }
 
-    public static DiscordSRVUtil util() {
+    public static ExcellentEconomyGet get() {
         require();
-        return util;
+        return get;
+    }
+
+    public static ExcellentEconomyWithdraw withdraw() {
+        require();
+        return withdraw;
+    }
+
+    public static ExcellentEconomyDeposit deposit() {
+        require();
+        return deposit;
     }
 }

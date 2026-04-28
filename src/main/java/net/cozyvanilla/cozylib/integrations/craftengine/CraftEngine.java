@@ -13,7 +13,6 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 
 public final class CraftEngine implements Listener, Integration {
-    private final Plugin plugin;
 
     // static
     private static final String pluginName = "CraftEngine";
@@ -25,7 +24,6 @@ public final class CraftEngine implements Listener, Integration {
     private static CraftEngineUtil util;
 
     public CraftEngine(@NotNull Plugin plugin) {
-        this.plugin = plugin;
     }
 
     @Override
@@ -35,8 +33,8 @@ public final class CraftEngine implements Listener, Integration {
 
     @Override
     public void enable() {
-        Plugin craftEngine = PluginUtils.getPlugin(getName());
-        if (craftEngine == null) {
+        Plugin plugin = PluginUtils.getPlugin(getName());
+        if (plugin == null) {
             Console.severe(pluginName + " not found! Disabling integration..");
             return;
         }
