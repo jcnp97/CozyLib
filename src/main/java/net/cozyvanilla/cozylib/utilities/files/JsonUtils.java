@@ -4,12 +4,15 @@ import com.google.gson.*;
 import net.cozyvanilla.cozylib.modules.messages.Console;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
 import java.util.Map;
 
 public class JsonUtils {
@@ -37,12 +40,12 @@ public class JsonUtils {
         if (!source.exists() || !source.isFile()) {
             throw new IllegalArgumentException("Source is not a file: " + source);
         }
-        if (!source.getName().toLowerCase().endsWith(".json")) {
+
+        if (!isJsonFile(source)) {
             throw new IllegalArgumentException("Source must be a .json file: " + source.getName());
         }
 
         targetDir.mkdirs();
-
         File target = resolveJson(targetDir, targetName);
         if (target.exists() && !overwrite) {
             return;
@@ -67,6 +70,33 @@ public class JsonUtils {
     public static void clone(@NotNull Plugin plugin, @NotNull String path, File jsonFile, String fileName, boolean overwrite) {
         File parentDirectory = new File(plugin.getDataFolder(), path);
         clone(parentDirectory, jsonFile, fileName, overwrite);
+    }
+
+    /**
+     * Retrieves a file from the plugin data folder if it is a JSON file.
+     *
+     * @param plugin plugin used to resolve the data folder
+     * @param path relative file path
+     * @return the JSON file, or null if not a JSON file
+     */
+    @Nullable
+    public static File getFile(@NotNull Plugin plugin, @NotNull String path) {
+        File file = new File(plugin.getDataFolder(), path);
+        if (isJsonFile(file)) {
+            return file;
+        }
+
+        return null;
+    }
+
+    /**
+     * Checks whether the given file has a .json extension.
+     *
+     * @param file file to check
+     * @return true if the file is a JSON file, false otherwise
+     */
+    public static boolean isJsonFile(File file) {
+        return file.getName().toLowerCase().endsWith(".json");
     }
 
     /**
@@ -105,6 +135,41 @@ public class JsonUtils {
         File target = resolveJson(targetDir, targetName);
         clone(targetDir, source, targetName, true);
         rewriteJsonStrings(target, replacements);
+    }
+
+    /**
+     * Cleans the given JSON file by deleting its contents and recreating it
+     * with an empty JSON object.
+     *
+     * @param jsonFile the JSON file to clean
+     * @return the cleaned JSON file
+     */
+    @NotNull
+    public static File clean(@NotNull File jsonFile) {
+        if (!jsonFile.exists() || !jsonFile.isFile()) {
+            throw new IllegalArgumentException("File does not exist or is not a file: " + jsonFile);
+        }
+
+        if (!isJsonFile(jsonFile)) {
+            throw new IllegalArgumentException("File must be a .json file: " + jsonFile.getName());
+        }
+
+        try {
+            Path path = jsonFile.toPath();
+            Files.delete(path);
+
+            Files.writeString(
+                    path,
+                    "{}",
+                    StandardCharsets.UTF_8,
+                    StandardOpenOption.CREATE,
+                    StandardOpenOption.WRITE
+            );
+
+            return jsonFile;
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to clean JSON file: " + jsonFile, e);
+        }
     }
 
     // -------------------------------------------------------------------------

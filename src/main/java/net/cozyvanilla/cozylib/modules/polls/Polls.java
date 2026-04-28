@@ -4,11 +4,11 @@ import github.scarsz.discordsrv.dependencies.jda.api.EmbedBuilder;
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import net.cozyvanilla.cozylib.Enums;
 import net.cozyvanilla.cozylib.integrations.discordsrv.DiscordSRV;
-import net.cozyvanilla.cozylib.integrations.discordsrv.DiscordSRVUtil;
 import net.cozyvanilla.cozylib.modules.Module;
 import net.cozyvanilla.cozylib.services.files.JsonFileReader;
 import net.cozyvanilla.cozylib.services.files.JsonFileWriter;
 import net.cozyvanilla.cozylib.services.files.YamlFileReader;
+import net.cozyvanilla.cozylib.utilities.files.JsonUtils;
 import net.cozyvanilla.cozylib.utilities.java.ColorUtils;
 import net.cozyvanilla.cozylib.utilities.java.HashMapUtils;
 import net.cozyvanilla.cozylib.utilities.numbers.DecimalUtils;
@@ -26,7 +26,6 @@ public final class Polls implements Module<PollsCommands> {
     public final PollsCommands commands;
 
     private final Plugin plugin;
-
     private final Map<String, Double> polls = new LinkedHashMap<>();
 
     private JsonFileWriter writer;
@@ -136,6 +135,7 @@ public final class Polls implements Module<PollsCommands> {
         List<String> fields = new ArrayList<>();
         String timestamp = DiscordSRV.util().getTimestamp(expiresAt);
         String winner = null;
+        String winnerPct = null;
 
         for (Map.Entry<String, Double> entry : polls.entrySet()) {
             String pollName = StringUtils.format(entry.getKey());
@@ -145,15 +145,16 @@ public final class Polls implements Module<PollsCommands> {
             String bar = getProgress(progress, progressBarLength);
             fields.add(pollName + ";" + bar + " " + progress + "%;false");
 
-            if (winner == null) {
+            if (winner == null && hasEnded) {
                 winner = pollName;
+                winnerPct = "(" + progress + "%)";
             }
         }
 
         if (hasEnded) {
-            fields.add(";:party_popper: **Winner: " + winner + "**;false");
+            fields.add(";:party_popper: **Winner: " + winner + " " + winnerPct + "**;false");
         } else {
-            fields.add(";:hourglass: Ends In: " + timestamp + ";false");
+            fields.add(";:hourglass: Ends: " + timestamp + ";false");
         }
 
         return fields;
@@ -162,10 +163,12 @@ public final class Polls implements Module<PollsCommands> {
     private EmbedBuilder createEmbed(boolean hasEnded) {
         double sum = getSum();
         String color = "#55FF55";
+        String footer = "Last Updated: ";
         HashMapUtils.sortDouble(polls, Enums.Ordering.DESC);
 
         if (hasEnded) {
             color = "#FF5555";
+            footer = "Poll Ended: ";
         }
 
         return DiscordSRV.util().getEmbedMessage(
@@ -173,7 +176,7 @@ public final class Polls implements Module<PollsCommands> {
                 null,
                 ColorUtils.fromHex(color),
                 generateFields(sum, hasEnded),
-                "Last Updated: " + InstantUtils.toReadable(Instant.now(), "Asia/Singapore"));
+                footer + InstantUtils.toReadable(Instant.now(), "Asia/Singapore"));
     }
 
     private void task() {
@@ -181,9 +184,21 @@ public final class Polls implements Module<PollsCommands> {
         boolean hasEnded = hasEnded();
 
         sendToDiscord(hasEnded);
-        if (hasEnded) {
-            expiresAt = null;
+        if (hasEnded) endPoll();
+    }
+
+    private void endPoll() {
+        String time = InstantUtils.toString(Instant.now());
+        File file = JsonUtils.getFile(plugin, "modules/polls/storage.json");
+        if (file != null) {
+            JsonUtils.clone(plugin, "modules/polls/logs", file, time, true);
+            writer = new JsonFileWriter(plugin, JsonUtils.clean(file));
         }
+
+        // clean current cached data
+        expiresAt = null;
+        lastMessageId = null;
+        polls.clear();
     }
 
     // public
@@ -196,10 +211,12 @@ public final class Polls implements Module<PollsCommands> {
         // create new post
         DiscordSRV.util().sendEmbedMessage(channelId, createEmbed(hasEnded))
                 .thenAccept(messageId -> {
-                    lastMessageId = messageId;
-                    AsyncUtils.async(plugin, () -> {
-                        writer.writeString("lastMessageId", messageId, true);
-                    });
+                    if (!hasEnded) {
+                        lastMessageId = messageId;
+                        AsyncUtils.async(plugin, () -> {
+                            writer.writeString("lastMessageId", messageId, true);
+                        });
+                    }
                 })
                 .exceptionally(error -> {
                     error.printStackTrace();
