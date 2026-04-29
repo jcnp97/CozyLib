@@ -7,7 +7,6 @@ import su.nightexpress.excellenteconomy.api.currency.ExcellentCurrency;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -41,12 +40,12 @@ public class ExcellentEconomyGet {
         return getBalance(player, "money");
     }
 
-//    public List<String> getCurrencies(String s) {
-//        List<String> list = new ArrayList<>();
-//        for (ExcellentCurrency currency : api.getCurrencies()) {
-//            list.add(currency.getId());
-//        }
-//
-//        return list;
-//    }
+    public List<String> getCurrencies() {
+        List<String> list = new ArrayList<>();
+        for (ExcellentCurrency currency : api.getCurrencies()) {
+            list.add(currency.getId());
+        }
+
+        return list;
+    }
 }

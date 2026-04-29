@@ -3,7 +3,10 @@ package net.cozyvanilla.cozylib.utilities.bukkit.players;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class PlayerUtils {
 
@@ -82,5 +85,26 @@ public class PlayerUtils {
         }
 
         return Bukkit.getOfflinePlayer(playerName).getUniqueId();
+    }
+
+    /**
+     * Retrieves all currently online players as a new {@link Set}.
+     * Ensures the returned set is mutable and not backed by Bukkit's internal collection.
+     *
+     * @return a mutable set of online players
+     */
+    public static Set<Player> getOnlinePlayers() {
+        return new HashSet<>(Set.copyOf(Bukkit.getOnlinePlayers()));
+    }
+
+    /**
+     * Retrieves the UUIDs of all currently online players.
+     *
+     * @return a set containing UUIDs of online players
+     */
+    public static Set<UUID> getOnlineUUIDs() {
+        return getOnlinePlayers().stream()
+                .map(Player::getUniqueId)
+                .collect(Collectors.toSet());
     }
 }

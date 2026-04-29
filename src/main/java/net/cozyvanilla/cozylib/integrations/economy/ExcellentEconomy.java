@@ -55,6 +55,8 @@ public final class ExcellentEconomy implements Integration {
             ExcellentEconomyAPI api = provider.getProvider();
             // load APIs
             get = new ExcellentEconomyGet(api);
+            deposit = new ExcellentEconomyDeposit(api);
+            withdraw = new ExcellentEconomyWithdraw(api);
 
             // change into load state
             state = Enums.PluginState.LOADED;

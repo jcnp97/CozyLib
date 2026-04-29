@@ -134,8 +134,7 @@ public final class Polls implements Module<PollsCommands> {
     private List<String> generateFields(double sum, boolean hasEnded) {
         List<String> fields = new ArrayList<>();
         String timestamp = DiscordSRV.util().getTimestamp(expiresAt);
-        String winner = null;
-        String winnerPct = null;
+        boolean hasWinner = false;
 
         for (Map.Entry<String, Double> entry : polls.entrySet()) {
             String pollName = StringUtils.format(entry.getKey());
@@ -143,17 +142,16 @@ public final class Polls implements Module<PollsCommands> {
 
             double progress = DecimalUtils.format((value / sum) * 100.0);
             String bar = getProgress(progress, progressBarLength);
-            fields.add(pollName + ";" + bar + " " + progress + "%;false");
 
-            if (winner == null && hasEnded) {
-                winner = pollName;
-                winnerPct = "(" + progress + "%)";
+            if (hasEnded && !hasWinner) {
+                fields.add(pollName + " (Winner);" + bar + " " + progress + "%;false");
+                hasWinner = true;
+            } else {
+                fields.add(pollName + ";" + bar + " " + progress + "%;false");
             }
         }
 
-        if (hasEnded) {
-            fields.add(";:party_popper: **Winner: " + winner + " " + winnerPct + "**;false");
-        } else {
+        if (!hasEnded) {
             fields.add(";:hourglass: Ends: " + timestamp + ";false");
         }
 
@@ -163,16 +161,18 @@ public final class Polls implements Module<PollsCommands> {
     private EmbedBuilder createEmbed(boolean hasEnded) {
         double sum = getSum();
         String color = "#55FF55";
+        String header = "Which content would you like to see on the next update?";
         String footer = "Last Updated: ";
         HashMapUtils.sortDouble(polls, Enums.Ordering.DESC);
 
         if (hasEnded) {
             color = "#FF5555";
+            header = "This poll has ended. Results:";
             footer = "Poll Ended: ";
         }
 
         return DiscordSRV.util().getEmbedMessage(
-                "Which content would you like to see on the next update?",
+                header,
                 null,
                 ColorUtils.fromHex(color),
                 generateFields(sum, hasEnded),

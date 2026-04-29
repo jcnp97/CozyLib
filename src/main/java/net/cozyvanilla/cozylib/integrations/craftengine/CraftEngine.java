@@ -1,5 +1,6 @@
 package net.cozyvanilla.cozylib.integrations.craftengine;
 
+import net.cozyvanilla.cozylib.CozyLib;
 import net.cozyvanilla.cozylib.Enums;
 import net.cozyvanilla.cozylib.integrations.Integration;
 import net.cozyvanilla.cozylib.modules.messages.Console;
@@ -23,8 +24,7 @@ public final class CraftEngine implements Listener, Integration {
     private static CraftEngineItem item;
     private static CraftEngineUtil util;
 
-    public CraftEngine(@NotNull Plugin plugin) {
-    }
+    public CraftEngine() {}
 
     @Override
     public String getName() {
@@ -33,15 +33,15 @@ public final class CraftEngine implements Listener, Integration {
 
     @Override
     public void enable() {
-        Plugin plugin = PluginUtils.getPlugin(getName());
-        if (plugin == null) {
+        Plugin craftEngine = PluginUtils.getPlugin(getName());
+        if (craftEngine == null) {
             Console.severe(pluginName + " not found! Disabling integration..");
             return;
         }
 
         state = Enums.PluginState.INSTALLED_NOT_LOADED;
         directory = PluginUtils.getDirectory(getName());
-        plugin.getServer().getPluginManager().registerEvents(this, plugin);
+        CozyLib.getInstance().getServer().getPluginManager().registerEvents(this, CozyLib.getInstance());
     }
 
     @Override
