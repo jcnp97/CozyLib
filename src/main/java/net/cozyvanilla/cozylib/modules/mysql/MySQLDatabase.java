@@ -25,7 +25,7 @@ public final class MySQLDatabase implements Module<Void> {
 
     @Override
     public String getPrefix() {
-        return "[CozyMySQL]";
+        return "[CozyLib-" + getName() + "]";
     }
 
     @Override
@@ -82,7 +82,7 @@ public final class MySQLDatabase implements Module<Void> {
             return new HikariDataSource(hikariConfig);
 
         } catch (Exception e) {
-            Console.severe("Failed to initialize MySQL Connection connection: " + e.getMessage());
+            Console.severe(getPrefix(), "Failed to initialize MySQL Connection connection: " + e.getMessage());
         }
 
         return null;
@@ -96,7 +96,7 @@ public final class MySQLDatabase implements Module<Void> {
 
     public Connection getConnection() throws SQLException {
         if (hikariDataSource == null || hikariDataSource.isClosed()) {
-            Console.severe("MySQL connection pool is not initialized or closed.");
+            Console.severe(getPrefix(), "MySQL connection pool is not initialized or closed.");
             throw new SQLException();
         }
 

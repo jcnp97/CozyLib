@@ -7,6 +7,7 @@ import net.cozyvanilla.cozylib.integrations.discordsrv.DiscordSRV;
 import net.cozyvanilla.cozylib.modules.Module;
 import net.cozyvanilla.cozylib.services.files.JsonFileReader;
 import net.cozyvanilla.cozylib.services.files.JsonFileWriter;
+import net.cozyvanilla.cozylib.services.files.LogFileManager;
 import net.cozyvanilla.cozylib.services.files.YamlFileReader;
 import net.cozyvanilla.cozylib.utilities.files.JsonUtils;
 import net.cozyvanilla.cozylib.utilities.java.ColorUtils;
@@ -16,6 +17,8 @@ import net.cozyvanilla.cozylib.utilities.paper.AsyncUtils;
 import net.cozyvanilla.cozylib.utilities.paper.TaskUtils;
 import net.cozyvanilla.cozylib.utilities.string.StringUtils;
 import net.cozyvanilla.cozylib.utilities.time.InstantUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.plugin.Plugin;
 
 import java.io.File;
@@ -23,9 +26,11 @@ import java.time.Instant;
 import java.util.*;
 
 public final class Polls implements Module<PollsCommands> {
+    private static final Logger log = LogManager.getLogger(Polls.class);
     public final PollsCommands commands;
 
     private final Plugin plugin;
+    private final LogFileManager logFileManager;
     private final Map<String, Double> polls = new LinkedHashMap<>();
 
     private JsonFileWriter writer;
@@ -41,16 +46,17 @@ public final class Polls implements Module<PollsCommands> {
     public Polls(Plugin plugin) {
         this.plugin = plugin;
         this.commands = new PollsCommands(this);
+        this.logFileManager = new LogFileManager(plugin, "modules/polls/logs", 30);
     }
 
     @Override
     public String getName() {
-        return "Polls/CozyPolls";
+        return "Polls";
     }
 
     @Override
     public String getPrefix() {
-        return "[CozyPolls]";
+        return "[CozyLib-" + getName() + "]";
     }
 
     @Override
@@ -188,10 +194,11 @@ public final class Polls implements Module<PollsCommands> {
     }
 
     private void endPoll() {
-        String time = InstantUtils.toString(Instant.now());
+        //String time = InstantUtils.toString(Instant.now());
         File file = JsonUtils.getFile(plugin, "modules/polls/storage.json");
         if (file != null) {
-            JsonUtils.clone(plugin, "modules/polls/logs", file, time, true);
+            //JsonUtils.clone(plugin, "modules/polls/logs", file, time, true);
+            logFileManager.log(file);
             writer = new JsonFileWriter(plugin, JsonUtils.clean(file));
         }
 

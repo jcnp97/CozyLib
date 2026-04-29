@@ -3,8 +3,7 @@ package net.cozyvanilla.cozylib.utilities.time;
 import net.cozyvanilla.cozylib.Enums;
 
 import javax.annotation.Nullable;
-import java.time.Instant;
-import java.time.ZoneId;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
@@ -87,24 +86,114 @@ public class InstantUtils {
     }
 
     /**
-     * Converts an {@link Instant} into a formatted readable string using the given time zone.
+     * Converts an {@link Instant} into a formatted readable date-time string using the given format and timezone.
      *
-     * @param time the Instant to format
-     * @param timeZone the time zone ID (e.g., "America/New_York")
-     * @return formatted date-time string, or null if input is invalid or timezone is invalid
+     * @param time the instant to format
+     * @param dateFormat the predefined date format enum
+     * @param timeZone the timezone ID (e.g., "UTC", "America/New_York")
+     * @return formatted date-time string, or null if input is invalid or formatting fails
+     */
+    @Nullable
+    public static String toReadable(Instant time, Enums.DateFormat dateFormat, String timeZone) {
+        if (time == null || dateFormat == null || timeZone == null || timeZone.isEmpty()) {
+            return null;
+        }
+        try {
+            ZoneId zoneId = ZoneId.of(timeZone);
+            DateTimeFormatter formatter = dateFormat.getFormatter();
+
+            return formatter.format(time.atZone(zoneId));
+        } catch (Exception e) {
+            // invalid timezone or formatting issue
+            return null;
+        }
+    }
+
+    /**
+     * Converts an {@link Instant} into a readable date-time string using default format and system timezone.
+     *
+     * @param time the instant to format
+     * @return formatted date-time string, or null if input is invalid
+     */
+    @Nullable
+    public static String toReadable(Instant time) {
+        return toReadable(
+                time,
+                Enums.DateFormat.FULL_DATETIME,
+                ZoneId.systemDefault().getId()
+        );
+    }
+
+    /**
+     * Converts an {@link Instant} into a readable date-time string using default format and specified timezone.
+     *
+     * @param time the instant to format
+     * @param timeZone the timezone ID
+     * @return formatted date-time string, or null if input is invalid
      */
     @Nullable
     public static String toReadable(Instant time, String timeZone) {
-        if (time == null || timeZone == null || timeZone.isEmpty()) {
+        return toReadable(
+                time,
+                Enums.DateFormat.FULL_DATETIME,
+                timeZone
+        );
+    }
+
+    /**
+     * Converts an {@link Instant} into a readable date-time string using specified format and system timezone.
+     *
+     * @param time the instant to format
+     * @param dateFormat the predefined date format enum
+     * @return formatted date-time string, or null if input is invalid
+     */
+    @Nullable
+    public static String toReadable(Instant time, Enums.DateFormat dateFormat) {
+        return toReadable(
+                time,
+                dateFormat,
+                ZoneId.systemDefault().getId()
+        );
+    }
+
+    @Nullable
+    public static Instant fromReadable(String time, Enums.DateFormat dateFormat, String timeZone) {
+        if (time == null || dateFormat == null || time.isEmpty()) {
             return null;
         }
 
         try {
-            ZoneId zoneId = ZoneId.of(timeZone);
-            return FORMATTER.format(time.atZone(zoneId));
+            DateTimeFormatter formatter = dateFormat.getFormatter();
+
+            switch (dateFormat) {
+                case FULL_DATETIME_ZONED:
+                    return ZonedDateTime.parse(time, formatter).toInstant();
+
+                case FULL_DATE:
+                case ISO_DATE: {
+                    ZoneId zoneId = ZoneId.of(timeZone);
+                    LocalDate date = LocalDate.parse(time, formatter);
+                    return date.atStartOfDay(zoneId).toInstant();
+                }
+
+                case FULL_DATETIME:
+                case ISO_DATETIME: {
+                    ZoneId zoneId = ZoneId.of(timeZone);
+                    LocalDateTime dateTime = LocalDateTime.parse(time, formatter);
+                    return dateTime.atZone(zoneId).toInstant();
+                }
+
+                default:
+                    return null;
+            }
+
         } catch (Exception e) {
-            // invalid timezone
             return null;
         }
+    }
+
+    @Nullable
+    public static Instant fromReadable(String time, Enums.DateFormat dateFormat) {
+        return fromReadable(time, dateFormat, ZoneId.systemDefault().getId());
     }
 }

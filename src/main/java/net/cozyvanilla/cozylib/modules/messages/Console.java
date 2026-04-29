@@ -29,7 +29,7 @@ public final class Console implements Module<Void> {
 
     @Override
     public String getPrefix() {
-        return "[CozyConsole]";
+        return "[CozyLib-" + getName() + "]";
     }
 
     @Override

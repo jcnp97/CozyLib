@@ -33,7 +33,7 @@ public final class Messages implements Module<Void> {
 
     @Override
     public String getPrefix() {
-        return "[CozyMessages]";
+        return "[CozyLib-" + getName() + "]";
     }
 
     @Override

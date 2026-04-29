@@ -52,12 +52,12 @@ public final class Seasons implements Module<SeasonsCommands> {
 
     @Override
     public String getName() {
-        return "Seasons/CozySeasons";
+        return "Seasons";
     }
 
     @Override
     public String getPrefix() {
-        return "[CozySeasons]";
+        return "[CozyLib-" + getName() + "]";
     }
 
     @Override

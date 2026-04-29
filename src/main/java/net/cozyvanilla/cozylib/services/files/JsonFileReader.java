@@ -7,8 +7,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 import java.nio.file.Files;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 public class JsonFileReader {
 
@@ -114,6 +113,28 @@ public class JsonFileReader {
         return current;
     }
 
+    // -------------------------------------------------------------------------
+    // Public API
+    // -------------------------------------------------------------------------
+
+    /**
+     * Retrieves the set of keys from the specified JSON path.
+     *
+     * @param path the path to the JSON object (null or empty for root)
+     * @return a set of keys at the given path, or empty set if not found
+     */
+    public @NotNull Set<String> getKeys(@Nullable String path) {
+        JsonObject obj;
+        if (path == null || path.isEmpty()) {
+            obj = root;
+        } else {
+            obj = getObject(path);
+        }
+
+        if (obj == null) return Collections.emptySet();
+        return obj.keySet();
+    }
+
     /**
      * Gets a string value from the given path.
      *
@@ -190,6 +211,26 @@ public class JsonFileReader {
     public @Nullable JsonArray getArray(@NotNull String path) {
         JsonElement e = getElement(path);
         return (e != null && e.isJsonArray()) ? e.getAsJsonArray() : null;
+    }
+
+    /**
+     * Retrieves a list of strings from the JSON array at the given path.
+     *
+     * @param path the path to the JSON array
+     * @return a list of strings, or null if the array does not exist
+     */
+    public @Nullable List<String> getStringList(@NotNull String path) {
+        JsonArray array = getArray(path);
+        if (array == null) return null;
+
+        List<String> list = new ArrayList<>();
+        for (JsonElement e : array) {
+            if (e.isJsonPrimitive()) {
+                list.add(e.getAsString());
+            }
+        }
+
+        return list;
     }
 
     /**
