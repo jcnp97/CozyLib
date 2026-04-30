@@ -2,9 +2,9 @@ package net.cozyvanilla.cozylib.modules.mysql.services;
 
 import net.cozyvanilla.cozylib.Enums;
 import net.cozyvanilla.cozylib.modules.messages.Console;
-import net.cozyvanilla.cozylib.modules.mysql.MySQLDatabaseAPI;
-import net.cozyvanilla.cozylib.modules.mysql.abstracts.AbstractMySQLTable;
-import net.cozyvanilla.cozylib.modules.mysql.interfaces.PlayerKeyValueService;
+import net.cozyvanilla.cozylib.modules.mysql.abstracts.MySQLTable;
+import net.cozyvanilla.cozylib.modules.mysql.interfaces.PlayerRepository;
+import net.cozyvanilla.cozylib.modules.mysql.interfaces.ResultSetMapper;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.Connection;
@@ -20,12 +20,26 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-public class PlayerKeyValueImpl extends AbstractMySQLTable implements PlayerKeyValueService {
+public class PlayerKeyValueImpl extends MySQLTable implements PlayerRepository<Map<String, Integer>> {
+
+    // Maps (data_name -> amount) from a result set row
+    private static final ResultSetMapper<Map.Entry<String, Integer>> AMOUNT_MAPPER =
+            rs -> Map.entry(rs.getString("data_name"), rs.getInt("amount"));
+
+    // Maps (data_name -> obtained_at) from a result set row
+    private static final ResultSetMapper<Map.Entry<String, Instant>> OBTAINED_AT_MAPPER = rs -> {
+        Timestamp ts = rs.getTimestamp("obtained_at");
+        return Map.entry(rs.getString("data_name"), ts != null ? ts.toInstant() : null);
+    };
+
     private final Set<String> dataList;
 
     public PlayerKeyValueImpl(@NotNull String tableName, @NotNull Set<String> dataList) {
         super(tableName);
         this.dataList = dataList;
+        createTable();
+        createTrigger();
+        prune();
     }
 
     @Override
@@ -41,31 +55,23 @@ public class PlayerKeyValueImpl extends AbstractMySQLTable implements PlayerKeyV
     }
 
     @Override
-    public Map<String, Integer> getData(UUID uuid) {
+    protected void createTrigger() {}
+
+    @Override
+    public @NotNull Map<String, Integer> getOrCreate(UUID uuid) {
         Map<String, Integer> result = new HashMap<>();
 
-        String insertMissingRows =
-                "INSERT IGNORE INTO " + tableName + " (player_uuid, data_name, amount) VALUES (?, ?, 0)";
-
-        String selectQuery =
-                "SELECT data_name, amount FROM " + tableName + " WHERE player_uuid = ?";
-
-        try (Connection conn = MySQLDatabaseAPI.getConnection()) {
-            try (PreparedStatement insertStmt = conn.prepareStatement(insertMissingRows)) {
-                for (String data : dataList) {
-                    insertStmt.setString(1, uuid.toString());
-                    insertStmt.setString(2, data);
-                    insertStmt.addBatch();
-                }
-                insertStmt.executeBatch();
-            }
+        String selectQuery = "SELECT data_name, amount FROM " + tableName + " WHERE player_uuid = ?";
+        try (Connection conn = getConnection()) {
+            insertMissingRows(conn, uuid);
 
             try (PreparedStatement selectStmt = conn.prepareStatement(selectQuery)) {
                 selectStmt.setString(1, uuid.toString());
 
                 try (ResultSet rs = selectStmt.executeQuery()) {
                     while (rs.next()) {
-                        result.put(rs.getString("data_name"), rs.getInt("amount"));
+                        Map.Entry<String, Integer> entry = AMOUNT_MAPPER.fromResultSet(rs);
+                        result.put(entry.getKey(), entry.getValue());
                     }
                 }
             }
@@ -77,12 +83,12 @@ public class PlayerKeyValueImpl extends AbstractMySQLTable implements PlayerKeyV
     }
 
     @Override
-    public void updateData(UUID uuid, Map<String, Integer> data) {
+    public void update(UUID uuid, Map<String, Integer> data) {
         String upsertQuery =
                 "INSERT INTO " + tableName + " (player_uuid, data_name, amount) VALUES (?, ?, ?) " +
                         "ON DUPLICATE KEY UPDATE amount = VALUES(amount)";
 
-        try (Connection conn = MySQLDatabaseAPI.getConnection();
+        try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(upsertQuery)) {
 
             for (Map.Entry<String, Integer> entry : data.entrySet()) {
@@ -99,6 +105,21 @@ public class PlayerKeyValueImpl extends AbstractMySQLTable implements PlayerKeyV
     }
 
     @Override
+    public void prune() {
+        String deleteQuery =
+                "DELETE FROM " + tableName +
+                        " WHERE amount = 0" +
+                        " AND obtained_at IS NULL" +
+                        " AND last_updated <= NOW() - INTERVAL 7 DAY";
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(deleteQuery)) {
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            Console.severe("Error pruning table " + tableName + ": " + e.getMessage());
+        }
+    }
+
     public void setObtainedAt(UUID uuid, String dataName) {
         String insertMissingRow =
                 "INSERT IGNORE INTO " + tableName + " (player_uuid, data_name, amount) VALUES (?, ?, 0)";
@@ -107,7 +128,7 @@ public class PlayerKeyValueImpl extends AbstractMySQLTable implements PlayerKeyV
                 "UPDATE " + tableName + " SET obtained_at = CURRENT_TIMESTAMP " +
                         "WHERE player_uuid = ? AND data_name = ? AND obtained_at IS NULL";
 
-        try (Connection conn = MySQLDatabaseAPI.getConnection()) {
+        try (Connection conn = getConnection()) {
             try (PreparedStatement insertStmt = conn.prepareStatement(insertMissingRow)) {
                 insertStmt.setString(1, uuid.toString());
                 insertStmt.setString(2, dataName);
@@ -124,34 +145,20 @@ public class PlayerKeyValueImpl extends AbstractMySQLTable implements PlayerKeyV
         }
     }
 
-    @Override
     public Map<String, Instant> getObtainedAt(UUID uuid) {
         Map<String, Instant> result = new HashMap<>();
 
-        String insertMissingRows =
-                "INSERT IGNORE INTO " + tableName + " (player_uuid, data_name, amount) VALUES (?, ?, 0)";
+        String selectQuery = "SELECT data_name, obtained_at FROM " + tableName + " WHERE player_uuid = ?";
 
-        String selectQuery =
-                "SELECT data_name, obtained_at FROM " + tableName + " WHERE player_uuid = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(selectQuery)) {
 
-        try (Connection conn = MySQLDatabaseAPI.getConnection()) {
-            try (PreparedStatement insertStmt = conn.prepareStatement(insertMissingRows)) {
-                for (String data : dataList) {
-                    insertStmt.setString(1, uuid.toString());
-                    insertStmt.setString(2, data);
-                    insertStmt.addBatch();
-                }
-                insertStmt.executeBatch();
-            }
+            stmt.setString(1, uuid.toString());
 
-            try (PreparedStatement stmt = conn.prepareStatement(selectQuery)) {
-                stmt.setString(1, uuid.toString());
-
-                try (ResultSet rs = stmt.executeQuery()) {
-                    while (rs.next()) {
-                        Timestamp ts = rs.getTimestamp("obtained_at");
-                        result.put(rs.getString("data_name"), ts != null ? ts.toInstant() : null);
-                    }
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Map.Entry<String, Instant> entry = OBTAINED_AT_MAPPER.fromResultSet(rs);
+                    result.put(entry.getKey(), entry.getValue());
                 }
             }
         } catch (SQLException e) {
@@ -161,7 +168,6 @@ public class PlayerKeyValueImpl extends AbstractMySQLTable implements PlayerKeyV
         return result;
     }
 
-    @Override
     public List<UUID> getByObtainedAt(String dataName, int count, Enums.Ordering order) {
         List<UUID> result = new ArrayList<>();
 
@@ -171,7 +177,7 @@ public class PlayerKeyValueImpl extends AbstractMySQLTable implements PlayerKeyV
                         " ORDER BY obtained_at " + order.name() +
                         " LIMIT ?";
 
-        try (Connection conn = MySQLDatabaseAPI.getConnection();
+        try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(selectQuery)) {
 
             stmt.setString(1, dataName);
@@ -187,5 +193,20 @@ public class PlayerKeyValueImpl extends AbstractMySQLTable implements PlayerKeyV
         }
 
         return result;
+    }
+
+    // Inserts default rows for any data keys not yet present for this player
+    private void insertMissingRows(Connection conn, UUID uuid) throws SQLException {
+        String insertMissingRows =
+                "INSERT IGNORE INTO " + tableName + " (player_uuid, data_name, amount) VALUES (?, ?, 0)";
+
+        try (PreparedStatement insertStmt = conn.prepareStatement(insertMissingRows)) {
+            for (String data : dataList) {
+                insertStmt.setString(1, uuid.toString());
+                insertStmt.setString(2, data);
+                insertStmt.addBatch();
+            }
+            insertStmt.executeBatch();
+        }
     }
 }

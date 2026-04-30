@@ -173,7 +173,7 @@ public final class Polls implements Module<PollsCommands> {
 
         if (hasEnded) {
             color = "#FF5555";
-            header = "This poll has ended. Results:";
+            header = "Poll Results:";
             footer = "Poll Ended: ";
         }
 
@@ -182,7 +182,7 @@ public final class Polls implements Module<PollsCommands> {
                 null,
                 ColorUtils.fromHex(color),
                 generateFields(sum, hasEnded),
-                footer + InstantUtils.toReadable(Instant.now(), "Asia/Singapore"));
+                footer + InstantUtils.toReadable(Instant.now(), Enums.DateFormat.FULL_DATETIME_ZONED, "Asia/Singapore"));
     }
 
     private void task() {
@@ -220,7 +220,7 @@ public final class Polls implements Module<PollsCommands> {
                 .thenAccept(messageId -> {
                     if (!hasEnded) {
                         lastMessageId = messageId;
-                        AsyncUtils.async(plugin, () -> {
+                        AsyncUtils.asyncAndForget(plugin, () -> {
                             writer.writeString("lastMessageId", messageId, true);
                         });
                     }
@@ -233,7 +233,7 @@ public final class Polls implements Module<PollsCommands> {
 
     public void addPoll(String name) {
         polls.putIfAbsent(name, 0.0);
-        AsyncUtils.async(plugin, () -> {
+        AsyncUtils.asyncAndForget(plugin, () -> {
             writer.writeDouble("polls." + name, 0.0, false);
         });
     }
@@ -244,7 +244,7 @@ public final class Polls implements Module<PollsCommands> {
         String id = UUID.randomUUID().toString();
 
         expiresAt = expiration;
-        AsyncUtils.async(plugin, () -> {
+        AsyncUtils.asyncAndForget(plugin, () -> {
             writer.writeString("expirestAt", expirationStr, false);
             writer.writeString("id", id, false);
         });
@@ -255,7 +255,7 @@ public final class Polls implements Module<PollsCommands> {
         String expirationStr = InstantUtils.toString(expiration);
 
         expiresAt = expiration;
-        AsyncUtils.async(plugin, () -> {
+        AsyncUtils.asyncAndForget(plugin, () -> {
             writer.writeString("expirestAt", expirationStr, true);
         });
     }
@@ -267,7 +267,7 @@ public final class Polls implements Module<PollsCommands> {
 
             polls.put(name, value);
             Double finalValue = value;
-            AsyncUtils.async(plugin, () -> {
+            AsyncUtils.asyncAndForget(plugin, () -> {
                 writer.writeDouble("polls." + name, finalValue, true);
             });
 
