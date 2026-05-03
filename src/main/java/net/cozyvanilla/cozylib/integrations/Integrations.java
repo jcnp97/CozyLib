@@ -1,6 +1,8 @@
 package net.cozyvanilla.cozylib.integrations;
 
 import net.cozyvanilla.cozylib.Config;
+import net.cozyvanilla.cozylib.Logger;
+import net.cozyvanilla.cozylib.builders.MiniMessageBuilder;
 import net.cozyvanilla.cozylib.integrations.craftengine.CraftEngine;
 import net.cozyvanilla.cozylib.integrations.discordsrv.DiscordSRV;
 import net.cozyvanilla.cozylib.integrations.economy.ExcellentEconomy;

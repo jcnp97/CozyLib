@@ -2,8 +2,8 @@ package net.cozyvanilla.cozylib.modules.mysql;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import net.cozyvanilla.cozylib.Logger;
 import net.cozyvanilla.cozylib.modules.Module;
-import net.cozyvanilla.cozylib.modules.messages.Console;
 import net.cozyvanilla.cozylib.services.files.YamlFileReader;
 import org.bukkit.plugin.Plugin;
 
@@ -82,7 +82,7 @@ public final class MySQLDatabase implements Module<Void> {
             return new HikariDataSource(hikariConfig);
 
         } catch (Exception e) {
-            Console.severe(getPrefix(), "Failed to initialize MySQL Connection connection: " + e.getMessage());
+            Logger.severe("Failed to initialize MySQL Connection connection: ", e);
         }
 
         return null;
@@ -96,7 +96,7 @@ public final class MySQLDatabase implements Module<Void> {
 
     public Connection getConnection() throws SQLException {
         if (hikariDataSource == null || hikariDataSource.isClosed()) {
-            Console.severe(getPrefix(), "MySQL connection pool is not initialized or closed.");
+            Logger.severe("MySQL connection pool is not initialized or closed.");
             throw new SQLException();
         }
 

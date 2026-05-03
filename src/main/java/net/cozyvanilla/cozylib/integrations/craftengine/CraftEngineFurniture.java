@@ -1,5 +1,6 @@
 package net.cozyvanilla.cozylib.integrations.craftengine;
 
+import net.cozyvanilla.cozylib.Logger;
 import net.cozyvanilla.cozylib.modules.seasons.Seasons;
 import net.cozyvanilla.cozylib.utilities.bukkit.EntityUtils;
 import net.momirealms.craftengine.bukkit.entity.furniture.BukkitFurniture;
@@ -29,7 +30,7 @@ public class CraftEngineFurniture {
     private void hasFurniture(Location location) {
         Entity entity = EntityUtils.getNearest(location, null);
         if (entity != null) {
-            throw new IllegalArgumentException("Failed to place a CraftEngine furniture because the location has an existing entity!");
+            Logger.warning("Failed to place a furniture because the location has an existing entity");
         }
     }
 

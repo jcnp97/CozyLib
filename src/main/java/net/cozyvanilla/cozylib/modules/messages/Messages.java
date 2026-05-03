@@ -77,6 +77,7 @@ public final class Messages implements Module<Void> {
     @Override
     public void disable() {}
 
+    @NotNull
     private static String getColor(Enums.MessageType type) {
         return switch (type) {
             case INFO -> colors.INFO();
@@ -86,6 +87,7 @@ public final class Messages implements Module<Void> {
         };
     }
 
+    @NotNull
     private static String getIcon(Enums.MessageType type) {
         return switch (type) {
             case INFO -> icons.INFO();
@@ -95,6 +97,7 @@ public final class Messages implements Module<Void> {
         };
     }
 
+    @NotNull
     private static String getSound(Enums.MessageType type) {
         return switch (type) {
             case INFO -> sounds.INFO();
@@ -173,5 +176,10 @@ public final class Messages implements Module<Void> {
      */
     public static void broadcast(String message, Enums.MessageType type) {
         broadcast(message, type, true);
+    }
+
+    @NotNull
+    public static String getMessageType(Enums.MessageType type) {
+        return type != null ? "<white>" + getIcon(type) + " " + getColor(type) : "";
     }
 }

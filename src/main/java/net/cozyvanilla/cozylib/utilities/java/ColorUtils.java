@@ -69,4 +69,21 @@ public class ColorUtils {
         b = Math.max(0, Math.min(255, b));
         return new Color(r, g, b);
     }
+
+    /**
+     * Converts RGB values into a hex color string (e.g. "#FFFFFF").
+     * Returns white if any value is out of range (0-255).
+     *
+     * @param r red value (0-255)
+     * @param g green value (0-255)
+     * @param b blue value (0-255)
+     * @return the hex color string
+     */
+    public static String toHexFromRGB(int r, int g, int b) {
+        if (r < 0 || r > 255 || g < 0 || g > 255 || b < 0 || b > 255) {
+            return "#FFFFFF";
+        }
+
+        return String.format("#%02X%02X%02X", r, g, b);
+    }
 }

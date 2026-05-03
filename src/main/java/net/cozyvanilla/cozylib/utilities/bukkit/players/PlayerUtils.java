@@ -1,8 +1,13 @@
 package net.cozyvanilla.cozylib.utilities.bukkit.players;
 
+import net.cozyvanilla.cozylib.modules.messages.Console;
+import net.cozyvanilla.cozylib.utilities.messages.AdventureUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nullable;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -11,28 +16,41 @@ import java.util.stream.Collectors;
 public class PlayerUtils {
 
     /**
-     * Checks whether a player with the specified UUID is currently online.
+     * Gets an online player by name.
      *
-     * @param uuid the UUID of the player to check
-     * @return {@code true} if the player is online; {@code false} otherwise or if the UUID is {@code null}
+     * @param name the player name to search for
+     * @return the player, or null if not online
      */
-    public static boolean isOnline(UUID uuid) {
-        if (uuid == null) return false;
-        Player player = Bukkit.getPlayer(uuid);
+    @Nullable
+    public Player getOnlinePlayer(String name) {
+        Player player = Bukkit.getPlayer(name);
+        if (player != null && player.isOnline()) {
+            return player;
+        }
+
+        return null;
+    }
+
+    /**
+     * Checks if a player with the given name is online.
+     *
+     * @param name the player name to check
+     * @return true if the player is online
+     */
+    public static boolean isOnline(String name) {
+        Player player = Bukkit.getPlayer(name);
         return player != null && player.isOnline();
     }
 
     /**
-     * Retrieves the UUID of an online player by their exact username.
-     * <p>
-     * Returns {@code null} if the player is offline or not found.
-     * </p>
+     * Gets the UUID of an online player by exact name.
      *
-     * @param playerName the exact username of the player
-     * @return the UUID of the online player, or {@code null} if the player is not online
+     * @param name the exact player name to search for
+     * @return the player's UUID, or null if not online
      */
-    public static UUID getOnlineUUID(String playerName) {
-        Player player = Bukkit.getPlayerExact(playerName);
+    @Nullable
+    public static UUID getOnlineUUID(String name) {
+        Player player = Bukkit.getPlayerExact(name);
         if (player != null && player.isOnline()) {
             return player.getUniqueId();
         }
@@ -41,70 +59,80 @@ public class PlayerUtils {
     }
 
     /**
-     * Gets the last known username associated with the specified UUID.
-     * <p>
-     * This method will return the player's most recently known name,
-     * even if the player is currently offline.
-     * </p>
+     * Gets the name of an online player by UUID.
      *
-     * @param uuid the UUID of the player
-     * @return the player's name, or {@code null} if it cannot be resolved
+     * @param uuid the player UUID to search for
+     * @return the player's name, or null if not online
      */
-    public static String getName(UUID uuid) {
-        return Bukkit.getOfflinePlayer(uuid).getName();
-    }
-
-    /**
-     * Retrieves the UUID of a player by name, regardless of whether they are online.
-     * <p>
-     * This method uses Bukkit's offline player data to obtain the UUID
-     * even for players who have previously joined but are not currently online.
-     * </p>
-     *
-     * @param playerName the name of the player
-     * @return the UUID of the offline player
-     */
-    public static UUID getOfflineUUID(String playerName) {
-        return Bukkit.getOfflinePlayer(playerName).getUniqueId();
-    }
-
-    /**
-     * Retrieves the UUID of a player, checking both online and offline records.
-     * <p>
-     * If the player is online, their active UUID is returned.
-     * Otherwise, Bukkit’s offline player data is queried to obtain their UUID.
-     * </p>
-     *
-     * @param playerName the name of the player
-     * @return the UUID of the player, whether online or offline
-     */
-    public static UUID getUUID(String playerName) {
-        Player player = Bukkit.getPlayerExact(playerName);
+    @Nullable
+    public static String getOnlineName(UUID uuid) {
+        Player player = Bukkit.getPlayer(uuid);
         if (player != null && player.isOnline()) {
+            return player.getName();
+        }
+
+        return null;
+    }
+
+    /**
+     * Gets a cached offline player by name.
+     *
+     * @param name the player name to search for
+     * @return the player, or null if not cached or not online
+     */
+    @Nullable
+    public static Player getOfflinePlayer(String name) {
+        OfflinePlayer player = Bukkit.getOfflinePlayerIfCached(name);
+        if (player != null) {
+            return player.getPlayer();
+        }
+
+        return null;
+    }
+
+    /**
+     * Gets the UUID of a cached offline player by name.
+     *
+     * @param name the player name to search for
+     * @return the player's UUID, or null if not cached
+     */
+    @Nullable
+    public static UUID getOfflineUUID(String name) {
+        OfflinePlayer player = Bukkit.getOfflinePlayerIfCached(name);
+        if (player != null) {
             return player.getUniqueId();
         }
 
-        return Bukkit.getOfflinePlayer(playerName).getUniqueId();
+        return null;
     }
 
     /**
-     * Retrieves all currently online players as a new {@link Set}.
-     * Ensures the returned set is mutable and not backed by Bukkit's internal collection.
+     * Gets all currently online players as a mutable set.
      *
-     * @return a mutable set of online players
+     * @return a set of online players
      */
     public static Set<Player> getOnlinePlayers() {
         return new HashSet<>(Set.copyOf(Bukkit.getOnlinePlayers()));
     }
 
     /**
-     * Retrieves the UUIDs of all currently online players.
+     * Gets the UUIDs of all currently online players.
      *
-     * @return a set containing UUIDs of online players
+     * @return a set of online player UUIDs
      */
     public static Set<UUID> getOnlineUUIDs() {
         return getOnlinePlayers().stream()
                 .map(Player::getUniqueId)
                 .collect(Collectors.toSet());
+    }
+
+    /**
+     * Kicks a player with a predefined error message.
+     *
+     * @param player the player to kick
+     */
+    public static void kick(@NotNull Player player) {
+        // todo: add kicking log here
+        player.kick(AdventureUtils.toComponent("<red>[CozyLib] We have detected an unusual error. If the issue persists, please contact the administrator."));
     }
 }

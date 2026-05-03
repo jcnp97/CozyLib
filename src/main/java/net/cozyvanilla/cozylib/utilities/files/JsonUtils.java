@@ -1,6 +1,7 @@
 package net.cozyvanilla.cozylib.utilities.files;
 
 import com.google.gson.*;
+import net.cozyvanilla.cozylib.Logger;
 import net.cozyvanilla.cozylib.modules.messages.Console;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
@@ -54,7 +55,7 @@ public class JsonUtils {
         try {
             Files.copy(source.toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
-            Console.severe("Failed to clone JSON file: " + e.getMessage());
+            Logger.severe("Failed to clone JSON file: " + e.getMessage(), e);
         }
     }
 
@@ -193,7 +194,7 @@ public class JsonUtils {
             String output = new GsonBuilder().setPrettyPrinting().create().toJson(root);
             Files.writeString(file.toPath(), output, StandardCharsets.UTF_8);
         } catch (IOException e) {
-            Console.severe("Failed to rewrite JSON file: " + e.getMessage());
+            Logger.severe("Failed to rewrite JSON file: " + e.getMessage(), e);
         }
     }
 
@@ -206,7 +207,7 @@ public class JsonUtils {
             String output = new GsonBuilder().setPrettyPrinting().create().toJson(root);
             Files.writeString(file.toPath(), output, StandardCharsets.UTF_8);
         } catch (IOException e) {
-            Console.severe("Failed to rewrite JSON file: " + e.getMessage());
+            Logger.severe("Failed to rewrite JSON file: " + e.getMessage(), e);
         }
     }
 

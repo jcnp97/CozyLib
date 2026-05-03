@@ -2,6 +2,7 @@ package net.cozyvanilla.cozylib.utilities.paper;
 
 import org.bukkit.Location;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -76,41 +77,77 @@ public class FutureUtils {
     }
 
     /**
-     * Handles an optional future result with present, empty, and error callbacks.
+     * Handles an async Optional result by running the present, empty, or error callback.
      *
-     * @param future the optional future to handle
-     * @param ifPresent called when the optional has a value
-     * @param ifEmpty called when the optional is empty
-     * @param onError called when the future fails
-     * @param <T> the optional value type
+     * @param future the future containing an Optional result
+     * @param ifPresent runs when the Optional has a value
+     * @param ifEmpty runs when the Optional is empty
+     * @param onError runs when the future completes with an error
+     * @param <T> the value type inside the Optional
      */
-    public static <T> void handleAsync(CompletableFuture<Optional<T>> future,
-                                       Consumer<T> ifPresent,
-                                       Runnable ifEmpty,
-                                       Consumer<Throwable> onError) {
-        future.thenAccept(opt ->
-                opt.ifPresentOrElse(ifPresent, ifEmpty)
-        ).exceptionally(ex -> {
-            onError.accept(ex);
+    public static <T> void handleOptionalAsync(CompletableFuture<Optional<T>> future,
+                                               Consumer<T> ifPresent,
+                                               Runnable ifEmpty,
+                                               Consumer<Throwable> onError) {
+        future.thenAccept(opt -> {
+            if (opt.isPresent()) {
+                ifPresent.accept(opt.get());
+            } else if (ifEmpty != null) {
+                ifEmpty.run();
+            }
+        }).exceptionally(ex -> {
+            if (onError != null) {
+                onError.accept(ex);
+            }
             return null;
         });
     }
 
     /**
-     * Handles an optional future result with present and error callbacks.
+     * Handles an async Optional result by running the present or error callback.
      *
-     * @param future the optional future to handle
-     * @param ifPresent called when the optional has a value
-     * @param onError called when the future fails
-     * @param <T> the optional value type
+     * @param future the future containing an Optional result
+     * @param ifPresent runs when the Optional has a value
+     * @param onError runs when the future completes with an error
+     * @param <T> the value type inside the Optional
      */
-    public static <T> void handleAsync(CompletableFuture<Optional<T>> future,
-                                       Consumer<T> ifPresent,
+    public static <T> void handleOptionalAsync(CompletableFuture<Optional<T>> future,
+                                               Consumer<T> ifPresent,
+                                               Consumer<Throwable> onError) {
+        handleOptionalAsync(future, ifPresent, null, onError);
+    }
+
+    /**
+     * Handles an async result by running the success or error callback.
+     *
+     * @param future the future containing the async result
+     * @param onSuccess runs when the future completes successfully
+     * @param onError runs when the future completes with an error
+     * @param <T> the result type
+     */
+    public static <T> void handleAsync(CompletableFuture<T> future,
+                                       Consumer<T> onSuccess,
                                        Consumer<Throwable> onError) {
-        future.thenAccept(opt -> opt.ifPresent(ifPresent))
-                .exceptionally(ex -> {
-                    onError.accept(ex);
-                    return null;
-                });
+        future.thenAccept(result -> {
+            if (onSuccess != null) {
+                onSuccess.accept(result);
+            }
+        }).exceptionally(ex -> {
+            if (onError != null) {
+                onError.accept(ex);
+            }
+            return null;
+        });
+    }
+
+    /**
+     * Handles an async result by running the success callback.
+     *
+     * @param future the future containing the async result
+     * @param onSuccess runs when the future completes successfully
+     * @param <T> the result type
+     */
+    public static <T> void handleAsync(CompletableFuture<T> future, Consumer<T> onSuccess) {
+        handleAsync(future, onSuccess, null);
     }
 }

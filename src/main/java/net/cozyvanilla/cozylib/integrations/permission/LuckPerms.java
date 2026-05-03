@@ -1,6 +1,7 @@
 package net.cozyvanilla.cozylib.integrations.permission;
 
 import net.cozyvanilla.cozylib.Enums;
+import net.cozyvanilla.cozylib.Logger;
 import net.cozyvanilla.cozylib.integrations.Integration;
 import net.cozyvanilla.cozylib.modules.messages.Console;
 import net.cozyvanilla.cozylib.utilities.bukkit.PluginUtils;
@@ -30,7 +31,7 @@ public final class LuckPerms implements Integration {
     public void enable() {
         Plugin plugin = PluginUtils.getPlugin(getName());
         if (plugin == null) {
-            Console.severe(pluginName + " not found! Disabling integration..");
+            Logger.warning(pluginName + " not found! Disabling integration..");
             return;
         }
 

@@ -4,6 +4,7 @@ import github.scarsz.discordsrv.DiscordSRV;
 import github.scarsz.discordsrv.dependencies.jda.api.EmbedBuilder;
 import github.scarsz.discordsrv.dependencies.jda.api.JDA;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
+import net.cozyvanilla.cozylib.Logger;
 
 import java.awt.*;
 import java.time.Instant;
@@ -18,7 +19,9 @@ public class DiscordSRVUtil {
         TextChannel channel = jda.getTextChannelById(channelId);
 
         if (channel == null) {
-            future.completeExceptionally(new IllegalArgumentException("Channel not found"));
+            IllegalArgumentException ex = new IllegalArgumentException("Channel not found");
+            Logger.severe("Failed to send embed message: channel not found (" + channelId + ")", ex);
+            future.completeExceptionally(ex);
             return future;
         }
 

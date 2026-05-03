@@ -2,6 +2,7 @@ package net.cozyvanilla.cozylib.integrations.craftengine;
 
 import net.cozyvanilla.cozylib.CozyLib;
 import net.cozyvanilla.cozylib.Enums;
+import net.cozyvanilla.cozylib.Logger;
 import net.cozyvanilla.cozylib.integrations.Integration;
 import net.cozyvanilla.cozylib.modules.messages.Console;
 import net.cozyvanilla.cozylib.utilities.bukkit.PluginUtils;
@@ -35,7 +36,7 @@ public final class CraftEngine implements Listener, Integration {
     public void enable() {
         Plugin craftEngine = PluginUtils.getPlugin(getName());
         if (craftEngine == null) {
-            Console.severe(pluginName + " not found! Disabling integration..");
+            Logger.warning(pluginName + " not found! Disabling integration..");
             return;
         }
 

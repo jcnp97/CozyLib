@@ -1,8 +1,8 @@
 package net.cozyvanilla.cozylib.integrations.economy;
 
 import net.cozyvanilla.cozylib.Enums;
+import net.cozyvanilla.cozylib.Logger;
 import net.cozyvanilla.cozylib.integrations.Integration;
-import net.cozyvanilla.cozylib.modules.messages.Console;
 import net.cozyvanilla.cozylib.utilities.bukkit.PluginUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
@@ -33,7 +33,7 @@ public final class ExcellentEconomy implements Integration {
     public void enable() {
         Plugin plugin = PluginUtils.getPlugin(getName());
         if (plugin == null) {
-            Console.severe(pluginName + " not found! Disabling integration..");
+            Logger.warning(pluginName + " not found! Disabling integration..");
             return;
         }
 
@@ -68,9 +68,11 @@ public final class ExcellentEconomy implements Integration {
             case LOADED -> {
                 return;
             }
-            case NOT_INSTALLED -> throw new IllegalStateException(
+            case NOT_INSTALLED -> {
+                throw new IllegalStateException(
                     pluginName + " integration is unavailable because it is not installed or not enabled."
             );
+            }
             case INSTALLED_NOT_LOADED -> throw new IllegalStateException(
                     pluginName + " integration is unavailable because it has not finished initializing yet."
             );

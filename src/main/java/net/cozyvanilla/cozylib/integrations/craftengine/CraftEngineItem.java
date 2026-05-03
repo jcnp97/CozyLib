@@ -1,6 +1,6 @@
 package net.cozyvanilla.cozylib.integrations.craftengine;
 
-import net.cozyvanilla.cozylib.modules.messages.Console;
+import net.cozyvanilla.cozylib.Logger;
 import net.momirealms.craftengine.bukkit.api.CraftEngineItems;
 import net.momirealms.craftengine.bukkit.item.BukkitItemDefinition;
 import net.momirealms.craftengine.core.item.Item;
@@ -18,7 +18,7 @@ public class CraftEngineItem {
     private ItemStack getItemStack(Key key) {
         BukkitItemDefinition item = CraftEngineItems.byId(key);
         if (item == null) {
-            Console.severe("Invalid CraftEngineItem id '" + key + "'");
+            Logger.warning("Invalid CraftEngineItem id '" + key + "'");
             return null;
         }
 
