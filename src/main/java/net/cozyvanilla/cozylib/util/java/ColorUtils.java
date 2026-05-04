@@ -1,8 +1,10 @@
-package net.cozyvanilla.cozylib.utilities.java;
+package net.cozyvanilla.cozylib.util.java;
 
 import java.awt.*;
 
 public class ColorUtils {
+
+    private ColorUtils() {}
 
     /**
      * Converts a hex color string (e.g., "#FFFFFF") into a {@link Color}.

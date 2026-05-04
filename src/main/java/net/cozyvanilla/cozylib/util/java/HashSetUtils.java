@@ -1,9 +1,11 @@
-package net.cozyvanilla.cozylib.utilities.java;
+package net.cozyvanilla.cozylib.util.java;
 
 import java.util.HashSet;
 import java.util.Set;
 
 public class HashSetUtils {
+
+    private HashSetUtils() {}
 
     /**
      * Returns the intersection of two sets (elements present in both sets).

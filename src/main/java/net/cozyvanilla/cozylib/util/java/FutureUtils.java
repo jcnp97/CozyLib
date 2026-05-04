@@ -1,8 +1,7 @@
-package net.cozyvanilla.cozylib.utilities.paper;
+package net.cozyvanilla.cozylib.util.java;
 
 import org.bukkit.Location;
 import org.bukkit.plugin.Plugin;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -10,6 +9,8 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class FutureUtils {
+
+    private FutureUtils() {}
 
     /**
      * Runs a task asynchronously using Paper's async scheduler.

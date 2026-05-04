@@ -1,6 +1,6 @@
-package net.cozyvanilla.cozylib.utilities.java;
+package net.cozyvanilla.cozylib.util.java;
 
-import net.cozyvanilla.cozylib.Enums;
+import net.cozyvanilla.cozylib.common.enums.SortOrder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,13 +8,15 @@ import java.util.Map;
 
 public class HashMapUtils {
 
+    private HashMapUtils() {}
+
     /**
      * Sorts a map by its Double values based on the given ordering.
      *
      * @param map the map to sort
      * @param order the ordering (ascending or descending)
      */
-    public static void sortDouble(Map<String, Double> map, Enums.Ordering order) {
+    public static void sortDouble(Map<String, Double> map, SortOrder order) {
         List<Map.Entry<String, Double>> list = new ArrayList<>(map.entrySet());
 
         list.sort((a, b) -> order.isAscending()
@@ -33,7 +35,7 @@ public class HashMapUtils {
      * @param map the map to sort
      * @param order the ordering (ascending or descending)
      */
-    public static void sortInt(Map<String, Integer> map, Enums.Ordering order) {
+    public static void sortInt(Map<String, Integer> map, SortOrder order) {
         List<Map.Entry<String, Integer>> list = new ArrayList<>(map.entrySet());
 
         list.sort((a, b) -> order.isAscending()
@@ -52,7 +54,7 @@ public class HashMapUtils {
      * @param map the map to sort
      * @param order the ordering (ascending or descending)
      */
-    public static void sortLong(Map<String, Long> map, Enums.Ordering order) {
+    public static void sortLong(Map<String, Long> map, SortOrder order) {
         List<Map.Entry<String, Long>> list = new ArrayList<>(map.entrySet());
 
         list.sort((a, b) -> order.isAscending()
