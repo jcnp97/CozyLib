@@ -1,7 +1,8 @@
-package net.cozyvanilla.cozylib.services.files;
+package net.cozyvanilla.cozylib.util.yaml;
 
 import dev.dejvokep.boostedyaml.YamlDocument;
 import dev.dejvokep.boostedyaml.block.implementation.Section;
+import net.cozyvanilla.cozylib.CozyLib;
 import net.cozyvanilla.cozylib.utilities.numbers.IntegerUtils;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
@@ -11,41 +12,47 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
-public class YamlFileReader {
-    private final String prefix;
+public class YamlReader {
+    private final String filePath;
     private final YamlDocument yaml;
 
     /**
-     * Constructs a YamlFileReader instance.
-     * Initializes the YAML file from the plugin's data folder and sets a logging prefix.
+     * Creates a YAML reader for the given plugin data file path.
      *
-     * @param plugin   the plugin instance used to locate resources and data folder
-     * @param fileName the name of the YAML file to load
+     * @param plugin the plugin used to locate the data folder and default resource
+     * @param filePath the YAML file path inside the plugin data folder
      */
-    public YamlFileReader(@NotNull Plugin plugin, @NotNull String fileName) {
-        this.prefix = "[" + plugin.getName() + "]";
-        this.yaml = init(plugin, fileName);
+    public YamlReader(@NotNull Plugin plugin, @NotNull String filePath) {
+        this.filePath = filePath;
+        this.yaml = load(plugin);
     }
 
     /**
-     * Initializes and loads the YAML file.
-     * If a default resource exists inside the plugin jar, it will be used as a template.
+     * Creates a YAML reader using the CozyLib plugin instance.
      *
-     * @param plugin   the plugin instance
-     * @param fileName the YAML file name
-     * @return the loaded YamlDocument
-     * @throws IllegalStateException if loading fails
+     * @param filePath the YAML file path inside the CozyLib data folder
      */
-    private YamlDocument init(Plugin plugin, String fileName) {
-        File file = new File(plugin.getDataFolder(), fileName);
+    public YamlReader(@NotNull String filePath) {
+        this.filePath = filePath;
+        this.yaml = load(CozyLib.getInstance());
+    }
+
+    /**
+     * Loads or creates the YAML document from the plugin data folder.
+     *
+     * @param plugin the plugin used to locate the data folder and default resource
+     * @return the loaded YAML document
+     */
+    private YamlDocument load(Plugin plugin) {
+        File file = new File(plugin.getDataFolder(), filePath);
         file.getParentFile().mkdirs();
 
-        try (InputStream defaultFile = plugin.getResource(fileName)) {
+        try (InputStream defaultFile = plugin.getResource(filePath)) {
             return (defaultFile != null)
                     ? YamlDocument.create(file, defaultFile)
                     : YamlDocument.create(file);
         } catch (IOException e) {
-            throw new IllegalStateException(prefix + " Failed to load YAML file: " + fileName, e);
+            throw new IllegalStateException("Failed to load YAML file: " + filePath, e);
         }
     }
 
@@ -66,7 +73,7 @@ public class YamlFileReader {
     public Section getSection(String route) {
         Section section = yaml.getSection(route);
         if (section == null) {
-            throw new IllegalStateException(prefix + " Section " + route + " not found from Yaml File " + yaml.getNameAsString());
+            throw new IllegalStateException("Section " + route + " not found from Yaml File " + yaml.getNameAsString());
         }
         return section;
     }
@@ -78,6 +85,7 @@ public class YamlFileReader {
      * @param section the YAML section
      * @return a map of string keys to string values
      */
+    @NotNull
     public Map<String, String> stringKeyStringMap(Section section) {
         Map<String, String> map = new HashMap<>();
         if (section == null) return map;
@@ -98,6 +106,7 @@ public class YamlFileReader {
      * @param route the section path
      * @return a map of string keys to string values
      */
+    @NotNull
     public Map<String, String> stringKeyStringMap(String route) {
         return stringKeyStringMap(getSection(route));
     }
@@ -108,6 +117,7 @@ public class YamlFileReader {
      * @param section the YAML section
      * @return a map of string keys to integer values
      */
+    @NotNull
     public Map<String, Integer> stringKeyIntMap(Section section) {
         Map<String, Integer> map = new HashMap<>();
         if (section == null) return map;
@@ -128,6 +138,7 @@ public class YamlFileReader {
      * @param route the section path
      * @return a map of string keys to integer values
      */
+    @NotNull
     public Map<String, Integer> stringKeyIntMap(String route) {
         return stringKeyIntMap(getSection(route));
     }
@@ -138,6 +149,7 @@ public class YamlFileReader {
      * @param section the YAML section
      * @return a map of string keys to double values
      */
+    @NotNull
     public Map<String, Double> stringKeyDoubleMap(Section section) {
         Map<String, Double> map = new HashMap<>();
         if (section == null) return map;
@@ -158,6 +170,7 @@ public class YamlFileReader {
      * @param route the section path
      * @return a map of string keys to double values
      */
+    @NotNull
     public Map<String, Double> stringKeyDoubleMap(String route) {
         return stringKeyDoubleMap(getSection(route));
     }
@@ -168,6 +181,7 @@ public class YamlFileReader {
      * @param section the YAML section
      * @return a map of string keys to boolean values
      */
+    @NotNull
     public Map<String, Boolean> stringKeyBooleanMap(Section section) {
         Map<String, Boolean> map = new HashMap<>();
         if (section == null) return map;
@@ -188,6 +202,7 @@ public class YamlFileReader {
      * @param route the section path
      * @return a map of string keys to boolean values
      */
+    @NotNull
     public Map<String, Boolean> stringKeyBooleanMap(String route) {
         return stringKeyBooleanMap(getSection(route));
     }
@@ -198,6 +213,7 @@ public class YamlFileReader {
      * @param section the YAML section
      * @return a map of string keys to long values
      */
+    @NotNull
     public Map<String, Long> stringKeyLongMap(Section section) {
         Map<String, Long> map = new HashMap<>();
         if (section == null) return map;
@@ -218,6 +234,7 @@ public class YamlFileReader {
      * @param route the section path
      * @return a map of string keys to long values
      */
+    @NotNull
     public Map<String, Long> stringKeyLongMap(String route) {
         return stringKeyLongMap(getSection(route));
     }
@@ -229,6 +246,7 @@ public class YamlFileReader {
      * @param section the YAML section
      * @return a map of string keys to sets of strings
      */
+    @NotNull
     public Map<String, Set<String>> stringKeySetMap(Section section) {
         Map<String, Set<String>> map = new HashMap<>();
         if (section == null) return map;
@@ -250,6 +268,7 @@ public class YamlFileReader {
      * @param route the section path
      * @return a map of string keys to sets of strings
      */
+    @NotNull
     public Map<String, Set<String>> stringKeySetMap(String route) {
         return stringKeySetMap(getSection(route));
     }
@@ -261,6 +280,7 @@ public class YamlFileReader {
      * @param section the YAML section
      * @return a map of integer keys to string values
      */
+    @NotNull
     public Map<Integer, String> intKeyStringMap(Section section) {
         Map<Integer, String> map = new HashMap<>();
         if (section == null) return map;
@@ -282,6 +302,7 @@ public class YamlFileReader {
      * @param route the section path
      * @return a map of integer keys to string values
      */
+    @NotNull
     public Map<Integer, String> intKeyStringMap(String route) {
         return intKeyStringMap(getSection(route));
     }
@@ -292,6 +313,7 @@ public class YamlFileReader {
      * @param section the YAML section
      * @return a map of integer keys to integer values
      */
+    @NotNull
     public Map<Integer, Integer> intKeyIntMap(Section section) {
         Map<Integer, Integer> map = new HashMap<>();
         if (section == null) return map;
