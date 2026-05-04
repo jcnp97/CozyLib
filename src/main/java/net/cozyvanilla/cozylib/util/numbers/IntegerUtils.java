@@ -1,4 +1,4 @@
-package net.cozyvanilla.cozylib.utilities.numbers;
+package net.cozyvanilla.cozylib.util.numbers;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

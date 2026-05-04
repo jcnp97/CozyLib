@@ -1,9 +1,11 @@
-package net.cozyvanilla.cozylib.utilities.numbers;
+package net.cozyvanilla.cozylib.util.numbers;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 public class DecimalUtils {
+
+    private DecimalUtils() {}
 
     /**
      * Rounds the given double value to two decimal places and returns it
@@ -117,47 +119,6 @@ public class DecimalUtils {
             return Double.parseDouble(input.trim());
         } catch (NumberFormatException e) {
             return 0.0;
-        }
-    }
-
-    /**
-     * Converts a string representation of a number into a {@code double}.
-     * <p>
-     * The input string may contain:
-     * <ul>
-     *   <li>Comma separators (e.g., "1,000,000.00")</li>
-     *   <li>A decimal point</li>
-     *   <li>An optional leading minus sign for negative values (e.g., "-123.45")</li>
-     * </ul>
-     * <p>
-     * Any string containing invalid characters (letters, symbols other than {@code ,} or {@code .}),
-     * or an incorrectly formatted number will cause a {@link NumberFormatException}.
-     *
-     * @param value the string to convert
-     * @return the numeric {@code double} value represented by the string
-     * @throws NumberFormatException if the input string is {@code null}, empty, or not a valid number
-     */
-    public static double stringToDouble(String value) {
-        if (value == null || value.isEmpty()) {
-            throw new NumberFormatException("Input string is null or empty");
-        }
-
-        boolean isNegative = false;
-        if (value.startsWith("-")) {
-            isNegative = true;
-            value = value.substring(1);
-        }
-
-        if (!value.matches("[0-9.,]+")) {
-            throw new NumberFormatException("Invalid characters in input: " + value);
-        }
-
-        value = value.replace(",", "");
-        try {
-            double result = Double.parseDouble(value);
-            return isNegative ? -result : result;
-        } catch (NumberFormatException e) {
-            throw new NumberFormatException("Unable to parse double from input: " + value);
         }
     }
 }
