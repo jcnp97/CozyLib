@@ -1,4 +1,4 @@
-package net.cozyvanilla.cozylib.utilities.messages;
+package net.cozyvanilla.cozylib.util.text;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
