@@ -1,4 +1,4 @@
-package net.cozyvanilla.cozylib.services.files;
+package net.cozyvanilla.cozylib.util.json;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.*;
 import java.nio.file.Files;
 
-public class JsonFileWriter {
+public class JsonWriter {
     private final String prefix;
     private final Gson gson;
     private final File file;
@@ -24,7 +24,7 @@ public class JsonFileWriter {
      * @param plugin   the plugin instance
      * @param fileName the file name to load
      */
-    public JsonFileWriter(@NotNull Plugin plugin, @NotNull String fileName) {
+    public JsonWriter(@NotNull Plugin plugin, @NotNull String fileName) {
         this.prefix = "[" + plugin.getName() + "]";
         this.gson = new GsonBuilder().setPrettyPrinting().create();
         this.file = init(plugin, fileName);
@@ -37,7 +37,7 @@ public class JsonFileWriter {
      * @param plugin the plugin instance
      * @param file   the file to load
      */
-    public JsonFileWriter(@NotNull Plugin plugin, @NotNull File file) {
+    public JsonWriter(@NotNull Plugin plugin, @NotNull File file) {
         this.prefix = "[" + plugin.getName() + "]";
         this.gson = new GsonBuilder().setPrettyPrinting().create();
         this.file = file;

@@ -1,8 +1,7 @@
-package net.cozyvanilla.cozylib.utilities.files;
+package net.cozyvanilla.cozylib.util.json;
 
 import com.google.gson.*;
 import net.cozyvanilla.cozylib.Logger;
-import net.cozyvanilla.cozylib.modules.messages.Console;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

@@ -1,4 +1,4 @@
-package net.cozyvanilla.cozylib.services.files;
+package net.cozyvanilla.cozylib.util.json;
 
 import com.google.gson.*;
 import org.bukkit.plugin.Plugin;
@@ -9,7 +9,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.util.*;
 
-public class JsonFileReader {
+public class JsonReader {
 
     private final String prefix;
     private final Gson gson;
@@ -22,7 +22,7 @@ public class JsonFileReader {
      * @param plugin   the plugin instance
      * @param fileName the file name to load
      */
-    public JsonFileReader(@NotNull Plugin plugin, @NotNull String fileName) {
+    public JsonReader(@NotNull Plugin plugin, @NotNull String fileName) {
         this.prefix = "[" + plugin.getName() + "]";
         this.gson = new GsonBuilder().setPrettyPrinting().create();
         this.file = init(plugin, fileName);
@@ -35,7 +35,7 @@ public class JsonFileReader {
      * @param plugin the plugin instance
      * @param file   the file to load
      */
-    public JsonFileReader(@NotNull Plugin plugin, @NotNull File file) {
+    public JsonReader(@NotNull Plugin plugin, @NotNull File file) {
         this.prefix = "[" + plugin.getName() + "]";
         this.gson = new GsonBuilder().setPrettyPrinting().create();
         this.file = file;
