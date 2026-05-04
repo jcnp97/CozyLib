@@ -4,5 +4,6 @@ public enum MessageType {
     INFO,
     WARNING,
     SEVERE,
-    NOTIFY
+    NOTIFICATION,
+    BROADCAST
 }

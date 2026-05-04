@@ -61,7 +61,7 @@ public final class TextBuilder {
             this.color(color);
         }
 
-        prefix = icon + " " + prefix;
+        prefix = "<white>" + icon + " " + prefix;
         return this;
     }
 
