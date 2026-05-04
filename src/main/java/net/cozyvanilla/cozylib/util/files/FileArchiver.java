@@ -2,7 +2,7 @@ package net.cozyvanilla.cozylib.util.files;
 
 import net.cozyvanilla.cozylib.Logger;
 import net.cozyvanilla.cozylib.common.enums.DateFormat;
-import net.cozyvanilla.cozylib.utilities.time.InstantUtils;
+import net.cozyvanilla.cozylib.util.java.InstantUtils;
 import org.bukkit.plugin.Plugin;
 
 import java.io.*;

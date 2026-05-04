@@ -5,6 +5,8 @@ import java.math.RoundingMode;
 
 public class IntegerUtils {
 
+    private IntegerUtils() {}
+
     /**
      * Parses the given string into an integer, stripping out non‑digit characters (except a leading minus).
      * Examples:

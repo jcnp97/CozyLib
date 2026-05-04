@@ -1,6 +1,6 @@
-package net.cozyvanilla.cozylib.utilities.cozylib.cooldowns;
+package net.cozyvanilla.cozylib.core.util;
 
-import net.cozyvanilla.cozylib.utilities.java.PerEntryExpiryCache;
+import net.cozyvanilla.cozylib.util.external.PerEntryExpiryCache;
 
 import java.time.Duration;
 import java.util.Objects;

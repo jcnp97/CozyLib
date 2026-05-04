@@ -31,4 +31,14 @@ public enum TimeUnit {
         long millis = (long) Math.ceil(value * this.millis);
         return Math.ceilDiv(millis, 50L);
     }
+
+    public long toSeconds(long value) {
+        long millis = toMillis(value);
+        return Math.ceilDiv(millis, 1_000L);
+    }
+
+    public long toSeconds(double value) {
+        long millis = (long) Math.ceil(value * this.millis);
+        return Math.ceilDiv(millis, 1_000L);
+    }
 }

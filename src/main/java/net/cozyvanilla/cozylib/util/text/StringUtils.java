@@ -1,9 +1,11 @@
-package net.cozyvanilla.cozylib.utilities.string;
+package net.cozyvanilla.cozylib.util.text;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class StringUtils {
+
+    private StringUtils() {}
 
     /**
      * Formats a string by replacing underscores with spaces, converting all characters to lowercase,
@@ -12,7 +14,7 @@ public class StringUtils {
      * @param string The input string to format (e.g., "HELLO_WORLD" becomes "Hello World").
      * @return A human-readable version of the string with proper capitalization, or the original string if null or empty.
      */
-    public static String format(String string) {
+    public static String toReadable(String string) {
         if (string == null || string.isEmpty()) return string;
 
         String formatted = string.replace("_", " ").toLowerCase();

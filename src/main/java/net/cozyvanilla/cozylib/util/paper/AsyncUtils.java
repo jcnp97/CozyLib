@@ -1,13 +1,15 @@
-package net.cozyvanilla.cozylib.utilities.paper;
+package net.cozyvanilla.cozylib.util.paper;
 
-import net.cozyvanilla.cozylib.annotations.FoliaUnsafe;
-import net.cozyvanilla.cozylib.modules.messages.Console;
+import net.cozyvanilla.cozylib.Logger;
+import net.cozyvanilla.cozylib.common.annotations.NotFoliaSafe;
 import org.bukkit.plugin.Plugin;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class AsyncUtils {
+
+    private AsyncUtils() {}
 
     /**
      * Runs a task asynchronously without returning a result or callback.
@@ -17,13 +19,11 @@ public class AsyncUtils {
      * @param task the task to run asynchronously
      */
     public static void asyncAndForget(Plugin plugin, Runnable task) {
-        String prefix = "[" + plugin.getName() + "] ";
         plugin.getServer().getAsyncScheduler().runNow(plugin, t -> {
             try {
                 task.run();
-            } catch (Throwable th) {
-                Console.severe(prefix, "Async task failed: " + th.getMessage());
-                th.printStackTrace();
+            } catch (Throwable e) {
+                Logger.severe("Async task failed: ", e);
             }
         });
     }
@@ -37,16 +37,14 @@ public class AsyncUtils {
      * @param callback the sync callback receiving the result
      * @param <T> the result type
      */
-    @FoliaUnsafe
+    @NotFoliaSafe
     public static <T> void asyncThenSync(Plugin plugin, Supplier<T> task, Consumer<T> callback) {
-        String prefix = "[" + plugin.getName() + "] ";
         plugin.getServer().getAsyncScheduler().runNow(plugin, t -> {
             T result;
             try {
                 result = task.get();
             } catch (Exception e) {
-                Console.severe(prefix, "Async task failed: " + e.getMessage());
-                e.printStackTrace();
+                Logger.severe("Async task failed: ", e);
                 return;
             }
 

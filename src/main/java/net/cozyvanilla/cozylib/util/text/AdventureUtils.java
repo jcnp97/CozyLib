@@ -13,6 +13,8 @@ public class AdventureUtils {
     private static final LegacyComponentSerializer legacyAmpersand = LegacyComponentSerializer.legacyAmpersand();
     private static final LegacyComponentSerializer legacySection = LegacyComponentSerializer.legacySection();
 
+    private AdventureUtils() {}
+
     /**
      * Converts a formatted string into an Adventure {@link Component}.
      * Supports MiniMessage, legacy ampersand (&) and section (§) color codes.

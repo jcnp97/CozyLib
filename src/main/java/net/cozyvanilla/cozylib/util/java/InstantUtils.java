@@ -1,15 +1,15 @@
-package net.cozyvanilla.cozylib.utilities.time;
+package net.cozyvanilla.cozylib.util.java;
 
-import net.cozyvanilla.cozylib.Enums;
+import net.cozyvanilla.cozylib.common.enums.DateFormat;
+import net.cozyvanilla.cozylib.common.enums.TimeUnit;
 
 import javax.annotation.Nullable;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.util.Locale;
 
 public class InstantUtils {
-    private static final DateTimeFormatter FORMATTER =
-            DateTimeFormatter.ofPattern("MMMM dd, yyyy | h:mm a", Locale.ENGLISH);
+
+    private InstantUtils() {}
 
     /**
      * Gets the current timestamp as an {@link Instant}.
@@ -31,16 +31,16 @@ public class InstantUtils {
      * @param value amount of time units to add
      * @param unit  unit of time (SECOND, MINUTE, HOUR)
      */
-    public static Instant future(long value, Enums.TimeUnits unit) {
-        long added = 0L;
+    public static Instant future(long value, TimeUnit unit) {
+        long multiplier = 0L;
 
         switch (unit) {
-            case SECOND -> added = 1L;
-            case MINUTE -> added = 60L;
-            case HOUR -> added = 3600L;
+            case SECOND -> multiplier = 1L;
+            case MINUTE -> multiplier = 60L;
+            case HOUR -> multiplier = 3600L;
         }
 
-        return Instant.now().plusSeconds(added * value);
+        return future(multiplier * value);
     }
 
     /**
@@ -94,7 +94,7 @@ public class InstantUtils {
      * @return formatted date-time string, or null if input is invalid or formatting fails
      */
     @Nullable
-    public static String toReadable(Instant time, Enums.DateFormat dateFormat, String timeZone) {
+    public static String toReadable(Instant time, DateFormat dateFormat, String timeZone) {
         if (time == null || dateFormat == null || timeZone == null || timeZone.isEmpty()) {
             return null;
         }
@@ -119,7 +119,7 @@ public class InstantUtils {
     public static String toReadable(Instant time) {
         return toReadable(
                 time,
-                Enums.DateFormat.FULL_DATETIME,
+                DateFormat.FULL_DATETIME,
                 ZoneId.systemDefault().getId()
         );
     }
@@ -135,7 +135,7 @@ public class InstantUtils {
     public static String toReadable(Instant time, String timeZone) {
         return toReadable(
                 time,
-                Enums.DateFormat.FULL_DATETIME,
+                DateFormat.FULL_DATETIME,
                 timeZone
         );
     }
@@ -148,7 +148,7 @@ public class InstantUtils {
      * @return formatted date-time string, or null if input is invalid
      */
     @Nullable
-    public static String toReadable(Instant time, Enums.DateFormat dateFormat) {
+    public static String toReadable(Instant time, DateFormat dateFormat) {
         return toReadable(
                 time,
                 dateFormat,
@@ -156,8 +156,16 @@ public class InstantUtils {
         );
     }
 
+    /**
+     * Parses a readable date-time string into an {@link Instant} using the given format and timezone.
+     *
+     * @param time the string to parse
+     * @param dateFormat the predefined date format enum
+     * @param timeZone the timezone ID used for parsing (required for non-zoned formats)
+     * @return parsed instant, or null if input is invalid or parsing fails
+     */
     @Nullable
-    public static Instant fromReadable(String time, Enums.DateFormat dateFormat, String timeZone) {
+    public static Instant fromReadable(String time, DateFormat dateFormat, String timeZone) {
         if (time == null || dateFormat == null || time.isEmpty()) {
             return null;
         }
@@ -192,8 +200,15 @@ public class InstantUtils {
         }
     }
 
+    /**
+     * Parses a readable date-time string into an {@link Instant} using the given format and system timezone.
+     *
+     * @param time the string to parse
+     * @param dateFormat the predefined date format enum
+     * @return parsed instant, or null if input is invalid or parsing fails
+     */
     @Nullable
-    public static Instant fromReadable(String time, Enums.DateFormat dateFormat) {
+    public static Instant fromReadable(String time, DateFormat dateFormat) {
         return fromReadable(time, dateFormat, ZoneId.systemDefault().getId());
     }
 }

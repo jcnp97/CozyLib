@@ -1,6 +1,6 @@
 package net.cozyvanilla.cozylib;
 
-import net.cozyvanilla.cozylib.services.files.YamlFileReader;
+import net.cozyvanilla.cozylib.util.yaml.YamlReader;
 import org.bukkit.plugin.Plugin;
 
 import java.util.HashMap;
@@ -16,11 +16,11 @@ public class Config {
     public record Logger(boolean file, boolean console, boolean isVerbose) {}
 
     public Config(Plugin plugin) {
-        YamlFileReader reader = new YamlFileReader(plugin, "config.yml");
+        YamlReader reader = new YamlReader(plugin, "config.yml");
         readConfig(reader);
     }
 
-    private void readConfig(YamlFileReader reader) {
+    private void readConfig(YamlReader reader) {
         prefix = new Prefix(
                 reader.get().getString("plugin.prefix"),
                 reader.get().getString("plugin.command_prefix"));

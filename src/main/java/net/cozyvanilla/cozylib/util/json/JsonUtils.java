@@ -19,10 +19,6 @@ public class JsonUtils {
 
     private JsonUtils() {}
 
-    // -------------------------------------------------------------------------
-    // Public API
-    // -------------------------------------------------------------------------
-
     /**
      * Copies a JSON file into the target directory using the given target name.
      *

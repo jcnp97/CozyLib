@@ -8,6 +8,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class TaskUtils {
 
+    private TaskUtils() {}
+
     /**
      * Runs a repeating synchronous task with delay and interval using a custom TimeUnit.
      *

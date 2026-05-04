@@ -3,7 +3,7 @@ package net.cozyvanilla.cozylib.util.yaml;
 import dev.dejvokep.boostedyaml.YamlDocument;
 import dev.dejvokep.boostedyaml.block.implementation.Section;
 import net.cozyvanilla.cozylib.CozyLib;
-import net.cozyvanilla.cozylib.utilities.numbers.IntegerUtils;
+import net.cozyvanilla.cozylib.util.numbers.IntegerUtils;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
