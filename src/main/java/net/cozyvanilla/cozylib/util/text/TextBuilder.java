@@ -1,19 +1,21 @@
-package net.cozyvanilla.cozylib.modules.messages;
+package net.cozyvanilla.cozylib.util.text;
 
-import net.cozyvanilla.cozylib.Enums;
-import net.cozyvanilla.cozylib.utilities.java.ColorUtils;
+import net.cozyvanilla.cozylib.Config;
+import net.cozyvanilla.cozylib.Logger;
+import net.cozyvanilla.cozylib.common.enums.MessageType;
+import net.cozyvanilla.cozylib.util.java.ColorUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.jetbrains.annotations.NotNull;
 
-public final class Text {
+public final class TextBuilder {
     private static final MiniMessage MINI_MESSAGE = MiniMessage.miniMessage();
 
     private final String content;
     private String prefix = "";
     private String suffix = "";
 
-    private Text(String content) {
+    private TextBuilder(String content) {
         this.content = content;
     }
 
@@ -23,8 +25,8 @@ public final class Text {
      * @param s the text content
      * @return a new Text instance
      */
-    public static Text of(@NotNull String s) {
-        return new Text(s);
+    public static TextBuilder of(@NotNull String s) {
+        return new TextBuilder(s);
     }
 
     /**
@@ -51,18 +53,26 @@ public final class Text {
      * @param type the message type to apply
      * @return this Text instance
      */
-    public Text type(Enums.MessageType type) {
-        prefix = Messages.getMessageType(type) + prefix;
+    public TextBuilder type(MessageType type) {
+        String color = Config.getColor(type);
+        String icon = Config.getIcon(type);
+
+        if (color != null && !color.isBlank()) {
+            this.color(color);
+        }
+
+        prefix = icon + " " + prefix;
         return this;
     }
 
-    // ------- decorations -------
+    // ------------ decorations ------------
+
     /**
      * Applies bold formatting to the text.
      *
      * @return this Text instance
      */
-    public Text bold() {
+    public TextBuilder bold() {
         prefix += "<bold>";
         suffix = "</bold>" + suffix;
         return this;
@@ -73,7 +83,7 @@ public final class Text {
      *
      * @return this Text instance
      */
-    public Text italic() {
+    public TextBuilder italic() {
         prefix += "<italic>";
         suffix = "</italic>" + suffix;
         return this;
@@ -84,7 +94,7 @@ public final class Text {
      *
      * @return this Text instance
      */
-    public Text underline() {
+    public TextBuilder underline() {
         prefix += "<underlined>";
         suffix = "</underlined>" + suffix;
         return this;
@@ -95,7 +105,7 @@ public final class Text {
      *
      * @return this Text instance
      */
-    public Text strikethrough() {
+    public TextBuilder strikethrough() {
         prefix += "<strikethrough>";
         suffix = "</strikethrough>" + suffix;
         return this;
@@ -106,7 +116,7 @@ public final class Text {
      *
      * @return this Text instance
      */
-    public Text obfuscated() {
+    public TextBuilder obfuscated() {
         prefix += "<obfuscated>";
         suffix = "</obfuscated>" + suffix;
         return this;
@@ -117,21 +127,88 @@ public final class Text {
      *
      * @return this Text instance
      */
-    public Text reset() {
+    public TextBuilder reset() {
         prefix += "<reset>";
         return this;
     }
 
-    // ------- color formatting -------
+    // ------------ color formatting ------------
+
     /**
-     * Applies a hex color to the text.
+     * Applies either a hex color or a gradient to the text.
+     * <p>
+     * Accepted formats:
+     * <ul>
+     *     <li>{@code "#FF0000"} - hex</li>
+     *     <li>{@code "FF0000"} - hex</li>
+     *     <li>{@code "#FF0000:#77DD77"} - gradient</li>
+     *     <li>{@code "FF0000:77DD77"} - gradient</li>
+     * </ul>
      *
-     * @param hex the hex color in #RRGGBB format
-     * @return this Text instance
+     * @param colors the hex color or gradient colors
+     * @return this TextBuilder instance
      */
-    public Text hex(String hex) {
-        if (notValid(hex)) return this;
-        prefix += "<" + hex + ">";
+    public TextBuilder color(String colors) {
+        if (colors == null || colors.isBlank()) {
+            Logger.warning("No color provided");
+            return this;
+        }
+
+        colors = colors.trim();
+
+        if (!colors.contains(":")) {
+            if (!colors.startsWith("#")) {
+                colors = "#" + colors;
+            }
+
+            if (notValid(colors)) {
+                Logger.warning("Invalid hex color provided: " + colors);
+                return this;
+            }
+
+            prefix += "<" + colors + ">";
+            return this;
+        }
+
+        String[] split = colors.split(":");
+        if (split.length == 0) {
+            Logger.warning("No colors provided for gradient");
+            return this;
+        }
+
+        StringBuilder gradient = new StringBuilder("<gradient");
+        int validCount = 0;
+
+        for (String hex : split) {
+            if (hex == null || hex.isBlank()) {
+                Logger.warning("Invalid gradient color provided: " + colors);
+                return this;
+            }
+
+            hex = hex.trim();
+
+            if (!hex.startsWith("#")) {
+                hex = "#" + hex;
+            }
+
+            if (notValid(hex)) {
+                Logger.warning("Invalid gradient color provided: " + hex);
+                return this;
+            }
+
+            gradient.append(":").append(hex);
+            validCount++;
+        }
+
+        if (validCount < 2) {
+            Logger.warning("Gradient requires at least two valid colors: " + colors);
+            return this;
+        }
+
+        gradient.append(">");
+        prefix += gradient;
+        suffix = "</gradient>" + suffix;
+
         return this;
     }
 
@@ -143,48 +220,7 @@ public final class Text {
      * @param b the blue value
      * @return this Text instance
      */
-    public Text rgb(int r, int g, int b) {
-        return hex(ColorUtils.toHexFromRGB(r, g, b));
-    }
-
-    /**
-     * Applies a gradient using the given hex colors.
-     *
-     * @param hexColors the hex colors in #RRGGBB format
-     * @return this Text instance
-     */
-    public Text gradient(String... hexColors) {
-        if (hexColors == null || hexColors.length == 0) {
-            Console.severe("No colors provided for gradient");
-            return this;
-        }
-
-        StringBuilder gradient = new StringBuilder("<gradient");
-        int validCount = 0;
-
-        for (String hex : hexColors) {
-            if (!notValid(hex)) {
-                gradient.append(":").append(hex);
-                validCount++;
-            }
-        }
-
-        if (validCount == 0) {
-            Console.severe("No valid hex colors provided for gradient");
-            return this;
-        }
-
-        if (validCount == 1) {
-            String single = gradient.substring(gradient.lastIndexOf(":") + 1);
-            prefix += "<" + single + ">";
-            return this;
-        }
-
-        gradient.append(">");
-        prefix += gradient;
-        suffix = "</gradient>" + suffix;
-        return this;
-    }
+    public TextBuilder rgb(int r, int g, int b) { return color(ColorUtils.toHexFromRGB(r, g, b)); }
 
     /**
      * Applies rainbow formatting to the text.
@@ -192,7 +228,7 @@ public final class Text {
      * @param reversed whether the rainbow should be reversed
      * @return this Text instance
      */
-    public Text rainbow(boolean reversed) {
+    public TextBuilder rainbow(boolean reversed) {
         prefix += reversed ? "<rainbow:!>" : "<rainbow>";
         suffix = "</rainbow>" + suffix;
         return this;
@@ -205,7 +241,7 @@ public final class Text {
      * @param alpha the shadow opacity from 0 to 1
      * @return this Text instance
      */
-    public Text shadow(String hex, float alpha) {
+    public TextBuilder shadow(String hex, float alpha) {
         if (alpha < 0 || alpha > 1) { alpha = 0.25f; }
         if (notValid(hex)) hex = "#FFFFFF";
 
@@ -220,14 +256,14 @@ public final class Text {
      * @param hex the shadow hex color in #RRGGBB format
      * @return this Text instance
      */
-    public Text shadow(String hex) {
+    public TextBuilder shadow(String hex) {
         return shadow(hex, 0.25f);
     }
 
-    // ------- private helpers -------
+    // ------------ private helpers ------------
     private static boolean notValid(String hex) {
         if (hex == null || !hex.matches("#[0-9a-fA-F]{6}")) {
-            Console.severe("Invalid hex color: " + hex + " (expected format: #000000)");
+            Logger.warning("Invalid hex color: " + hex + " (expected format: #000000)");
             return true;
         }
 
