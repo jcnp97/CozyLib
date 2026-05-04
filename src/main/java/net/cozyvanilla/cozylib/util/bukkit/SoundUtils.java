@@ -1,18 +1,20 @@
-package net.cozyvanilla.cozylib.utilities.bukkit;
+package net.cozyvanilla.cozylib.util.bukkit;
 
-import net.cozyvanilla.cozylib.modules.messages.Console;
+import net.cozyvanilla.cozylib.Logger;
 import net.kyori.adventure.key.Key;
-import net.kyori.adventure.sound.Sound;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class SoundUtils {
 
+    private SoundUtils() {}
+
     /**
-     * Retrieves a {@link Sound} object based on the provided sound name, volume, and pitch.
+     * Retrieves a {@link net.kyori.adventure.sound.Sound} object based on the provided sound name, volume, and pitch.
      * Returns null if the name is invalid or cannot be parsed into a valid sound key.
      *
      * @param soundName the namespaced sound identifier (e.g., "minecraft:block.note_block.pling")
@@ -20,20 +22,21 @@ public class SoundUtils {
      * @param pitch     the pitch of the sound
      * @return the constructed Sound object, or null if invalid
      */
-    public static Sound get(String soundName, float volume, float pitch) {
+    @Nullable
+    public static net.kyori.adventure.sound.Sound get(String soundName, float volume, float pitch) {
         try {
             String[] parts = soundName.split(":", 2);
             String namespace = parts.length > 1 ? parts[0] : "minecraft";
             String key = parts.length > 1 ? parts[1] : parts[0];
 
-            return Sound.sound()
+            return net.kyori.adventure.sound.Sound.sound()
                     .type(Key.key(namespace, key))
-                    .source(Sound.Source.PLAYER)
+                    .source(net.kyori.adventure.sound.Sound.Source.PLAYER)
                     .volume(volume)
                     .pitch(pitch)
                     .build();
         } catch (Exception e) {
-            Console.severe(soundName + " is not a valid sound!");
+            Logger.warning(soundName + " is not a valid sound!");
         }
 
         return null;
@@ -45,7 +48,8 @@ public class SoundUtils {
      * @param soundName the sound name to resolve
      * @return the resolved sound, or null if invalid
      */
-    public static Sound get(String soundName) {
+    @Nullable
+    public static net.kyori.adventure.sound.Sound get(String soundName) {
         return get(soundName, 1.0f, 1.0f);
     }
 
@@ -60,7 +64,7 @@ public class SoundUtils {
     public static void playTo(@NotNull Player player, String soundName, float volume, float pitch) {
         if (!player.isOnline() || soundName.isEmpty()) return;
 
-        Sound sound = get(soundName, volume, pitch);
+        net.kyori.adventure.sound.Sound sound = get(soundName, volume, pitch);
         if (sound != null) player.playSound(sound);
     }
 
@@ -83,7 +87,7 @@ public class SoundUtils {
      * @param pitch the sound pitch
      */
     public static void playAt(@NotNull Location location, @NotNull String soundName, float volume, float pitch) {
-        Sound sound = get(soundName, volume, pitch);
+        net.kyori.adventure.sound.Sound sound = get(soundName, volume, pitch);
         World world = location.getWorld();
 
         if (sound == null || world == null) return;
@@ -109,7 +113,7 @@ public class SoundUtils {
     public static void stop(@NotNull Player player, String soundName) {
         if (!player.isOnline()) return;
 
-        Sound sound = get(soundName, 1.0f, 1.0f);
+        net.kyori.adventure.sound.Sound sound = get(soundName, 1.0f, 1.0f);
         if (sound != null) {
             player.stopSound(sound);
         }
@@ -123,7 +127,7 @@ public class SoundUtils {
      * @param pitch the sound pitch
      */
     public static void playToAll(String soundName, float volume, float pitch) {
-        Sound sound = get(soundName, volume, pitch);
+        net.kyori.adventure.sound.Sound sound = get(soundName, volume, pitch);
         if (sound != null) Bukkit.getServer().playSound(sound);
     }
 

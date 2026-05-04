@@ -1,8 +1,7 @@
-package net.cozyvanilla.cozylib.utilities.bukkit;
+package net.cozyvanilla.cozylib.util.bukkit;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FishHook;
 import org.bukkit.entity.Player;
@@ -13,6 +12,8 @@ import java.util.UUID;
 
 public class EntityUtils {
 
+    private EntityUtils() {}
+
     /**
      * Converts an entity to its UUID string.
      *
@@ -20,7 +21,7 @@ public class EntityUtils {
      * @return the entity UUID as a string, or null if entity is null
      */
     @Nullable
-    public static String toString(Entity entity) {
+    public static String toString(org.bukkit.entity.Entity entity) {
         if (entity == null) return null;
         return entity.getUniqueId().toString();
     }
@@ -32,7 +33,7 @@ public class EntityUtils {
      * @return the entity, or null if not found
      */
     @Nullable
-    public static Entity toEntity(String entityId) {
+    public static org.bukkit.entity.Entity toEntity(String entityId) {
         if (entityId == null) return null;
         return getEntity(UUID.fromString(entityId));
     }
@@ -44,7 +45,7 @@ public class EntityUtils {
      * @return the entity, or null if not found
      */
     @Nullable
-    public static Entity getEntity(UUID uuid) {
+    public static org.bukkit.entity.Entity getEntity(UUID uuid) {
         if (uuid == null) return null;
         return Bukkit.getEntity(uuid);
     }
@@ -55,7 +56,7 @@ public class EntityUtils {
      * @param entity the entity
      * @return the entity UUID
      */
-    public static UUID getUUID(@NotNull Entity entity) {
+    public static UUID getUUID(@NotNull org.bukkit.entity.Entity entity) {
         return entity.getUniqueId();
     }
 
@@ -68,15 +69,15 @@ public class EntityUtils {
      * @return the nearest matching entity, or null if none is found
      */
     @Nullable
-    public static Entity getNearest(@NotNull Location location, double maxDistance, @Nullable EntityType type) {
+    public static org.bukkit.entity.Entity getNearest(@NotNull Location location, double maxDistance, @Nullable EntityType type) {
         if (location.getWorld() == null) return null;
         Location center = location.clone().add(0.5, 0.5, 0.5);
 
         double maxDistanceSquared = maxDistance * maxDistance;
-        Entity nearest = null;
+        org.bukkit.entity.Entity nearest = null;
         double nearestDistance = Double.MAX_VALUE;
 
-        for (Entity entity : center.getWorld().getNearbyEntities(center, maxDistance, maxDistance, maxDistance)) {
+        for (org.bukkit.entity.Entity entity : center.getWorld().getNearbyEntities(center, maxDistance, maxDistance, maxDistance)) {
             if (type != null && entity.getType() != type) continue;
 
             double distanceSquared = entity.getLocation().distanceSquared(center);
@@ -100,7 +101,7 @@ public class EntityUtils {
      * @param type the entity type to match, or null for any type
      * @return the nearest matching entity within the same block, or null if none is found
      */
-    public static Entity getNearest(@NotNull Location location, @Nullable EntityType type) {
+    public static org.bukkit.entity.Entity getNearest(@NotNull Location location, @Nullable EntityType type) {
         return getNearest(location, 0.9, type);
     }
 
@@ -112,7 +113,7 @@ public class EntityUtils {
      * @param type the entity type to match, or null for any type
      * @return the nearest matching entity, or null if none is found
      */
-    public static Entity getNearest(@NotNull Player player, double maxDistance, @Nullable EntityType type) {
+    public static org.bukkit.entity.Entity getNearest(@NotNull Player player, double maxDistance, @Nullable EntityType type) {
         return getNearest(player.getLocation(), maxDistance, type);
     }
 
@@ -126,7 +127,7 @@ public class EntityUtils {
      * @param type the entity type to match, or null for any type
      * @return the nearest matching entity within the player's block, or null if none is found
      */
-    public static Entity getNearest(@NotNull Player player, @Nullable EntityType type) {
+    public static org.bukkit.entity.Entity getNearest(@NotNull Player player, @Nullable EntityType type) {
         return getNearest(player.getLocation(), 0.9, type);
     }
 
@@ -147,7 +148,7 @@ public class EntityUtils {
      * @return the fishhook, or null if not found or not a fishhook
      */
     public static FishHook getFishHook(UUID uuid) {
-        Entity entity = Bukkit.getEntity(uuid);
+        org.bukkit.entity.Entity entity = Bukkit.getEntity(uuid);
         if (entity instanceof FishHook fishHook) {
             return fishHook;
         }

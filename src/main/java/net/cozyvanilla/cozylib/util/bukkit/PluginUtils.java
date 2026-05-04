@@ -1,4 +1,4 @@
-package net.cozyvanilla.cozylib.utilities.bukkit;
+package net.cozyvanilla.cozylib.util.bukkit;
 
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
@@ -7,6 +7,8 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 
 public class PluginUtils {
+
+    private PluginUtils() {}
 
     /**
      * Gets a plugin instance by its name.

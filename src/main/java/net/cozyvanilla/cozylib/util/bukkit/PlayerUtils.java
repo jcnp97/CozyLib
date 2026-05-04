@@ -1,10 +1,8 @@
-package net.cozyvanilla.cozylib.utilities.bukkit.players;
+package net.cozyvanilla.cozylib.util.bukkit;
 
-import net.cozyvanilla.cozylib.modules.messages.Console;
-import net.cozyvanilla.cozylib.utilities.messages.AdventureUtils;
+import net.cozyvanilla.cozylib.util.text.AdventureUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -15,6 +13,8 @@ import java.util.stream.Collectors;
 
 public class PlayerUtils {
 
+    private PlayerUtils() {}
+
     /**
      * Gets an online player by name.
      *
@@ -22,8 +22,8 @@ public class PlayerUtils {
      * @return the player, or null if not online
      */
     @Nullable
-    public Player getOnlinePlayer(String name) {
-        Player player = Bukkit.getPlayer(name);
+    public org.bukkit.entity.Player getOnlinePlayer(String name) {
+        org.bukkit.entity.Player player = Bukkit.getPlayer(name);
         if (player != null && player.isOnline()) {
             return player;
         }
@@ -38,7 +38,7 @@ public class PlayerUtils {
      * @return true if the player is online
      */
     public static boolean isOnline(String name) {
-        Player player = Bukkit.getPlayer(name);
+        org.bukkit.entity.Player player = Bukkit.getPlayer(name);
         return player != null && player.isOnline();
     }
 
@@ -50,7 +50,7 @@ public class PlayerUtils {
      */
     @Nullable
     public static UUID getOnlineUUID(String name) {
-        Player player = Bukkit.getPlayerExact(name);
+        org.bukkit.entity.Player player = Bukkit.getPlayerExact(name);
         if (player != null && player.isOnline()) {
             return player.getUniqueId();
         }
@@ -66,7 +66,7 @@ public class PlayerUtils {
      */
     @Nullable
     public static String getOnlineName(UUID uuid) {
-        Player player = Bukkit.getPlayer(uuid);
+        org.bukkit.entity.Player player = Bukkit.getPlayer(uuid);
         if (player != null && player.isOnline()) {
             return player.getName();
         }
@@ -81,7 +81,7 @@ public class PlayerUtils {
      * @return the player, or null if not cached or not online
      */
     @Nullable
-    public static Player getOfflinePlayer(String name) {
+    public static org.bukkit.entity.Player getOfflinePlayer(String name) {
         OfflinePlayer player = Bukkit.getOfflinePlayerIfCached(name);
         if (player != null) {
             return player.getPlayer();
@@ -111,7 +111,7 @@ public class PlayerUtils {
      *
      * @return a set of online players
      */
-    public static Set<Player> getOnlinePlayers() {
+    public static Set<org.bukkit.entity.Player> getOnlinePlayers() {
         return new HashSet<>(Set.copyOf(Bukkit.getOnlinePlayers()));
     }
 
@@ -122,7 +122,7 @@ public class PlayerUtils {
      */
     public static Set<UUID> getOnlineUUIDs() {
         return getOnlinePlayers().stream()
-                .map(Player::getUniqueId)
+                .map(org.bukkit.entity.Player::getUniqueId)
                 .collect(Collectors.toSet());
     }
 
@@ -131,7 +131,7 @@ public class PlayerUtils {
      *
      * @param player the player to kick
      */
-    public static void kick(@NotNull Player player) {
+    public static void kick(@NotNull org.bukkit.entity.Player player) {
         // todo: add kicking log here
         player.kick(AdventureUtils.toComponent("<red>[CozyLib] We have detected an unusual error. If the issue persists, please contact the administrator."));
     }
