@@ -1,4 +1,4 @@
-package net.cozyvanilla.cozylib.utilities.java;
+package net.cozyvanilla.cozylib.util.external;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
