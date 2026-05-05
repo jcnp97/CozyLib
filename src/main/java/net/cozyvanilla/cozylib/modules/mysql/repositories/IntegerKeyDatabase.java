@@ -1,6 +1,6 @@
 //package net.cozyvanilla.cozylib.modules.mysql.generic;
 //
-//import net.cozyvanilla.cozylib.modules.messages.Console;
+//import net.cozyvanilla.cozylib.modules.util.Console;
 //import net.cozyvanilla.cozylib.modules.mysql.MySQLConnection;
 //import net.cozyvanilla.cozylib.util.paper.AsyncUtils;
 //import org.bukkit.plugin.Plugin;

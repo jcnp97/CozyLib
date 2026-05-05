@@ -2,11 +2,11 @@ package net.cozyvanilla.cozylib.modules;
 
 import dev.jorel.commandapi.CommandAPICommand;
 import net.cozyvanilla.cozylib.Config;
-import net.cozyvanilla.cozylib.modules.messages.Console;
-import net.cozyvanilla.cozylib.modules.messages.Messages;
-import net.cozyvanilla.cozylib.modules.mysql.MySQLDatabase;
-import net.cozyvanilla.cozylib.modules.polls.Polls;
-import net.cozyvanilla.cozylib.modules.seasons.Seasons;
+import net.cozyvanilla.cozylib.common.enums.MessageType;
+import net.cozyvanilla.cozylib.modules.util.Console;
+import net.cozyvanilla.cozylib.runtime.MySQLConnection;
+import net.cozyvanilla.cozylib.modules.core.polls.Polls;
+import net.cozyvanilla.cozylib.modules.core.seasons.Seasons;
 import org.bukkit.plugin.Plugin;
 
 import java.util.HashSet;
@@ -16,10 +16,11 @@ public class Modules {
     private final Plugin plugin;
     private final Set<CommandAPICommand> commands = new HashSet<>();
 
-    private Console console;
-    private Messages messages;
+    // ------------ mandatory ------------
+    private MySQLConnection mysqlDatabase;
+
+    // ------------ optional ------------
     private Seasons seasons;
-    private MySQLDatabase mysql;
     private Polls polls;
 
     public Modules(Plugin plugin) {
@@ -28,70 +29,49 @@ public class Modules {
     }
 
     private void register() {
-        // always enabled
-        this.console = new Console(plugin);
-        console.enable();
+        // mandatory
+        this.mysqlDatabase = new MySQLConnection(plugin);
+        mysqlDatabase.enable();
 
-        // modules are always registered
-        this.messages = new Messages(plugin);
+
         this.seasons = new Seasons(plugin);
-        this.mysql = new MySQLDatabase(plugin);
         this.polls = new Polls(plugin);
 
-        Console.info("<bold>Modules Loaded:");
-        Console.info("<bold>---------------------------------------");
-
-        // MESSAGES MODULE
-        if (Config.hasModule("messages")) {
-            messages.enable();
-            Console.info("[+] " + messages.getName());
-        } else {
-            Console.severe("[-] " + messages.getName());
-        }
+        Console.print("<bold>Modules Loaded:", MessageType.INFO);
+        Console.print("<bold>---------------------------------------", MessageType.INFO);
 
         // SEASONS MODULE
         if (Config.hasModule("seasons")) {
             seasons.enable();
             commands.add(seasons.getCommands().get());
-            Console.info("[+] " + seasons.getName());
+            Console.print("[+] " + seasons.getName(), MessageType.INFO);
         } else {
-            Console.severe("[-] " + seasons.getName());
-        }
-
-        // MYSQL MODULE
-        if (Config.hasModule("mysql")) {
-            mysql.enable();
-            Console.info("[+] " + mysql.getName());
-        } else {
-            Console.severe("[-] " + mysql.getName());
+            Console.print("[-] " + seasons.getName(), MessageType.SEVERE);
         }
 
         // POLLS MODULE
         if (Config.hasModule("polls")) {
             polls.enable();
             commands.add(polls.getCommands().get());
-            Console.info("[+] " + polls.getName());
+            Console.print("[+] " + polls.getName(), MessageType.INFO);
         } else {
-            Console.severe("[-] " + polls.getName());
+            Console.print("[-] " + polls.getName(), MessageType.SEVERE);
         }
 
-        Console.info("<bold>---------------------------------------");
+        Console.print("<bold>---------------------------------------", MessageType.INFO);
 
         // register all enabled module's commands
         registerCommands();
     }
 
     public void disable() {
-        console.disable();
-        messages.disable();
         seasons.disable();
-        mysql.disable();
         polls.disable();
     }
 
     private void registerCommands() {
         if (commands.isEmpty()) {
-            Console.severe("", "No commands to register for /" + Config.getCommandPrefix());
+            Console.print("", "No commands to register for /" + Config.getCommandPrefix(), MessageType.SEVERE);
             return;
         }
 

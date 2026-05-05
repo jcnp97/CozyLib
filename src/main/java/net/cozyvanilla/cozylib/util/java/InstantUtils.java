@@ -211,4 +211,121 @@ public class InstantUtils {
     public static Instant fromReadable(String time, DateFormat dateFormat) {
         return fromReadable(time, dateFormat, ZoneId.systemDefault().getId());
     }
+
+    /**
+     * Calculates how much time has passed since the given {@link Instant}
+     * in the specified {@link TimeUnit}.
+     *
+     * <p>Examples:
+     * <ul>
+     *     <li>If unit = DAY and time was 3 days ago → returns 3</li>
+     *     <li>If unit = WEEK and time was 6.5 weeks ago → returns 6</li>
+     *     <li>If unit = WEEK and time was less than 1 week ago → returns 0</li>
+     *     <li>If time is in the future → returns 0</li>
+     * </ul>
+     *
+     * @param time the past instant to compare against current time
+     * @param unit the unit to measure the difference in
+     * @return elapsed time in whole units, or 0 if negative or less than one unit
+     */
+    public static long timeSince(Instant time, TimeUnit unit) {
+        if (time == null || unit == null) {
+            return 0L;
+        }
+
+        long nowMillis = Instant.now().toEpochMilli();
+        long timeMillis = time.toEpochMilli();
+
+        return diffFloor(nowMillis - timeMillis, unit);
+    }
+
+    /**
+     * Calculates the exact time elapsed since the given {@link Instant}
+     * in the specified {@link TimeUnit}, returning a fractional value.
+     *
+     * <p>Examples:
+     * <ul>
+     *     <li>If unit = WEEK and time was 6.5 weeks ago → returns ~6.5</li>
+     *     <li>If unit = DAY and time was 3.25 days ago → returns ~3.25</li>
+     *     <li>If time is in the future → returns 0.0</li>
+     * </ul>
+     *
+     * @param time the past instant to compare against current time
+     * @param unit the unit to measure the difference in
+     * @return elapsed time in units (fractional), or 0.0 if negative
+     */
+    public static double timeSinceExact(Instant time, TimeUnit unit) {
+        if (time == null || unit == null) {
+            return 0.0;
+        }
+
+        long nowMillis = Instant.now().toEpochMilli();
+        long timeMillis = time.toEpochMilli();
+
+        return diffExact(nowMillis - timeMillis, unit);
+    }
+
+    /**
+     * Calculates how much time remains before the given {@link Instant}
+     * in the specified {@link TimeUnit}.
+     *
+     * <p>Examples:
+     * <ul>
+     *     <li>If unit = DAY and time is 3 days in the future → returns 3</li>
+     *     <li>If unit = WEEK and time is 6.5 weeks in the future → returns 6</li>
+     *     <li>If unit = WEEK and time is less than 1 week away → returns 0</li>
+     *     <li>If time is in the past → returns 0</li>
+     * </ul>
+     *
+     * @param time the future instant to compare against current time
+     * @param unit the unit to measure the difference in
+     * @return remaining time in whole units, or 0 if negative or less than one unit
+     */
+    public static long timeUntil(Instant time, TimeUnit unit) {
+        if (time == null || unit == null) {
+            return 0L;
+        }
+
+        long nowMillis = Instant.now().toEpochMilli();
+        long timeMillis = time.toEpochMilli();
+
+        return diffFloor(timeMillis - nowMillis, unit);
+    }
+
+    /**
+     * Calculates the exact time remaining before the given {@link Instant}
+     * in the specified {@link TimeUnit}, returning a fractional value.
+     *
+     * <p>Examples:
+     * <ul>
+     *     <li>If unit = WEEK and time is 6.5 weeks ahead → returns ~6.5</li>
+     *     <li>If unit = DAY and time is 2.75 days ahead → returns ~2.75</li>
+     *     <li>If time is in the past → returns 0.0</li>
+     * </ul>
+     *
+     * @param time the future instant to compare against current time
+     * @param unit the unit to measure the difference in
+     * @return remaining time in units (fractional), or 0.0 if negative
+     */
+    public static double timeUntilExact(Instant time, TimeUnit unit) {
+        if (time == null || unit == null) {
+            return 0.0;
+        }
+
+        long nowMillis = Instant.now().toEpochMilli();
+        long timeMillis = time.toEpochMilli();
+
+        return diffExact(timeMillis - nowMillis, unit);
+    }
+
+    // ------------ private helpers ------------
+    private static long diffFloor(long diffMillis, TimeUnit unit) {
+        if (diffMillis <= 0) return 0L;
+        return diffMillis / unit.toMillis(1);
+    }
+
+    private static double diffExact(long diffMillis, TimeUnit unit) {
+        if (diffMillis <= 0) return 0.0;
+        return (double) diffMillis / unit.toMillis(1);
+    }
 }

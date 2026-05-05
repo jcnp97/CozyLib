@@ -1,9 +1,9 @@
 package net.cozyvanilla.cozylib.integrations.economy;
 
-import net.cozyvanilla.cozylib.Enums;
 import net.cozyvanilla.cozylib.Logger;
+import net.cozyvanilla.cozylib.common.enums.PluginState;
 import net.cozyvanilla.cozylib.integrations.Integration;
-import net.cozyvanilla.cozylib.utilities.bukkit.PluginUtils;
+import net.cozyvanilla.cozylib.util.bukkit.PluginUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -15,7 +15,7 @@ public final class ExcellentEconomy implements Integration {
 
     // static
     private static final String pluginName = "ExcellentEconomy";
-    private static Enums.PluginState state;
+    private static PluginState state;
     private static File directory;
 
     private static ExcellentEconomyGet get;
@@ -37,18 +37,18 @@ public final class ExcellentEconomy implements Integration {
             return;
         }
 
-        state = Enums.PluginState.INSTALLED_NOT_LOADED;
+        state = PluginState.INSTALLED_NOT_LOADED;
         directory = PluginUtils.getDirectory(getName());
     }
 
     @Override
     public void disable() {
-        state = Enums.PluginState.INSTALLED_NOT_LOADED;
+        state = PluginState.INSTALLED_NOT_LOADED;
     }
 
     @Override
     public void load() {
-        if (state == Enums.PluginState.LOADED) return;
+        if (state == PluginState.LOADED) return;
 
         RegisteredServiceProvider<ExcellentEconomyAPI> provider = Bukkit.getServer().getServicesManager().getRegistration(ExcellentEconomyAPI.class);
         if (provider != null) {
@@ -59,7 +59,7 @@ public final class ExcellentEconomy implements Integration {
             withdraw = new ExcellentEconomyWithdraw(api);
 
             // change into load state
-            state = Enums.PluginState.LOADED;
+            state = PluginState.LOADED;
         }
     }
 

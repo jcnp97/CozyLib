@@ -1,18 +1,46 @@
 plugin:
+  # What prefix should we use to on console messages?
   prefix: "[CozyLib]"
+  # What command prefix should we use? By default, "/cozy <module_name>"
   command_prefix: "cozy"
+  # How should we log for errors?
+  logging:
+    # Should we print errors into console?
+    console: true
+    # Should we print errors into .log files?
+    file: true
+    # Should we include stacktrace/s on errors? May cause spam to console and log files.
+    verbose: false
 
-redis:
-  host: 127.0.0.1
-  port: 6379
-  username: default
-  password: password
-  ssl: false
+messages:
+  color:
+    info: "#77DD77"
+    warning: "#FFD580"
+    severe: "#FF6961"
+    notification: "#FFFACD"
+    broadcast: "#EBD197;#B48811"
+  icon:
+    info: ""
+    warning: ""
+    severe: ""
+    notification: ""
+    broadcast: ""
+  sound:
+    info: ""
+    warning: ""
+    severe: ""
+    notification: ""
+    broadcast: ""
+
+mysql:
+  pool_name: cozylib-mysql
+  host: localhost
+  port: 3306
+  username: root
+  password: root
+  database: cozylib
 
 modules:
-  messages: true
-  sqlite: true
-  mysql: true
   redis: false
   seasons: true
   polls: true
@@ -20,8 +48,9 @@ modules:
 integrations:
   craft_engine: true
   discord_srv: true
+  excellent_economy: true
+  luck_perms: true
   world_guard: false
-  excellent_economy: false
   skins_restorer: false
   better_model: false
   packet_events: false

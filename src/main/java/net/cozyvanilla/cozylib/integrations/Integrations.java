@@ -1,13 +1,12 @@
 package net.cozyvanilla.cozylib.integrations;
 
 import net.cozyvanilla.cozylib.Config;
-import net.cozyvanilla.cozylib.Logger;
-import net.cozyvanilla.cozylib.builders.MiniMessageBuilder;
+import net.cozyvanilla.cozylib.common.enums.MessageType;
 import net.cozyvanilla.cozylib.integrations.craftengine.CraftEngine;
 import net.cozyvanilla.cozylib.integrations.discordsrv.DiscordSRV;
 import net.cozyvanilla.cozylib.integrations.economy.ExcellentEconomy;
 import net.cozyvanilla.cozylib.integrations.permission.LuckPerms;
-import net.cozyvanilla.cozylib.modules.messages.Console;
+import net.cozyvanilla.cozylib.modules.util.Console;
 import org.bukkit.plugin.Plugin;
 
 public class Integrations {
@@ -30,43 +29,43 @@ public class Integrations {
         this.excellentEconomy = new ExcellentEconomy();
         this.luckPerms = new LuckPerms();
 
-        Console.info("");
-        Console.info("<bold>Integrations Loaded:");
-        Console.info("<bold>---------------------------------------");
+        Console.print("", MessageType.INFO);
+        Console.print("<bold>Integrations Loaded:", MessageType.INFO);
+        Console.print("<bold>---------------------------------------", MessageType.INFO);
 
         // CRAFT ENGINE
         if (Config.hasIntegration("craft_engine")) {
             craftEngine.enable();
-            Console.info("[+] " + craftEngine.getName());
+            Console.print("[+] " + craftEngine.getName(), MessageType.INFO);
         } else {
-            Console.severe("[-] " + craftEngine.getName());
+            Console.print("[-] " + craftEngine.getName(),  MessageType.SEVERE);
         }
 
         // DISCORD_SRV
         if (Config.hasIntegration("discord_srv")) {
             discordSRV.enable();
-            Console.info("[+] " + discordSRV.getName());
+            Console.print("[+] " + discordSRV.getName(), MessageType.INFO);
         } else {
-            Console.severe("[-] " + discordSRV.getName());
+            Console.print("[-] " + discordSRV.getName(), MessageType.SEVERE);
         }
 
         // EXE_ECO
         if (Config.hasIntegration("excellent_economy")) {
             excellentEconomy.enable();
-            Console.info("[+] " + excellentEconomy.getName());
+            Console.print("[+] " + excellentEconomy.getName(), MessageType.INFO);
         } else {
-            Console.severe("[-] " + excellentEconomy.getName());
+            Console.print("[-] " + excellentEconomy.getName(), MessageType.SEVERE);
         }
 
         // LUCK_PERMS
         if (Config.hasIntegration("luck_perms")) {
             luckPerms.enable();
-            Console.info("[+] " + luckPerms.getName());
+            Console.print("[+] " + luckPerms.getName(), MessageType.INFO);
         } else {
-            Console.severe("[-] " + luckPerms.getName());
+            Console.print("[-] " + luckPerms.getName(), MessageType.SEVERE);
         }
 
-        Console.info("<bold>---------------------------------------");
+        Console.print("<bold>---------------------------------------", MessageType.INFO);
     }
 
     public void disable() {

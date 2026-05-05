@@ -4,9 +4,9 @@
 //import dev.jorel.commandapi.arguments.ArgumentSuggestions;
 //import dev.jorel.commandapi.arguments.StringArgument;
 //import net.cozyvanilla.cozylib.Enums;
-//import net.cozyvanilla.cozylib.modules.messages.Console;
-//import net.cozyvanilla.cozylib.modules.messages.Messages;
-//import net.cozyvanilla.cozylib.modules.seasons.SeasonsAPI;
+//import net.cozyvanilla.cozylib.modules.util.Console;
+//import net.cozyvanilla.cozylib.modules.util.Messages;
+//import net.cozyvanilla.cozylib.modules.core.seasons.SeasonsAPI;
 //import org.bukkit.entity.Player;
 //
 //import java.util.ArrayList;

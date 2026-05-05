@@ -1,15 +1,13 @@
 package net.cozyvanilla.cozylib.integrations.craftengine;
 
 import net.cozyvanilla.cozylib.Logger;
-import net.cozyvanilla.cozylib.modules.seasons.Seasons;
-import net.cozyvanilla.cozylib.utilities.bukkit.EntityUtils;
+import net.cozyvanilla.cozylib.util.bukkit.EntityUtils;
 import net.momirealms.craftengine.bukkit.entity.furniture.BukkitFurniture;
 import net.momirealms.craftengine.core.entity.furniture.*;
 import net.momirealms.craftengine.core.item.Item;
 import net.momirealms.craftengine.core.util.Color;
 import net.momirealms.craftengine.core.util.Key;
 import org.bukkit.Location;
-import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -28,18 +26,18 @@ public class CraftEngineFurniture {
     }
 
     private void hasFurniture(Location location) {
-        Entity entity = EntityUtils.getNearest(location, null);
+        org.bukkit.entity.Entity entity = EntityUtils.getNearest(location, null);
         if (entity != null) {
             Logger.warning("Failed to place a furniture because the location has an existing entity");
         }
     }
 
     @Nullable
-    private BukkitFurniture getFurnitureFromEntity(@NotNull Entity entity) {
+    private BukkitFurniture getFurnitureFromEntity(@NotNull org.bukkit.entity.Entity entity) {
         return net.momirealms.craftengine.bukkit.api.CraftEngineFurniture.getLoadedFurnitureByMetaEntity(entity);
     }
 
-    private boolean setColor(Entity entity, Color color) {
+    private boolean setColor(org.bukkit.entity.Entity entity, Color color) {
         BukkitFurniture furniture = getFurnitureFromEntity(entity);
         if (furniture == null) { return false; }
 
@@ -56,7 +54,7 @@ public class CraftEngineFurniture {
 
     // public API
     @Nullable
-    public Entity place(Location location, Key key, boolean sound) {
+    public org.bukkit.entity.Entity place(Location location, Key key, boolean sound) {
         hasFurniture(location);
 
         BukkitFurniture furniture = placeFurniture(location, key, sound);
@@ -67,7 +65,7 @@ public class CraftEngineFurniture {
         return null;
     }
 
-    public boolean remove(Entity entity) {
+    public boolean remove(org.bukkit.entity.Entity entity) {
         if (net.momirealms.craftengine.bukkit.api.CraftEngineFurniture.isFurniture(entity)) {
             return net.momirealms.craftengine.bukkit.api.CraftEngineFurniture.remove(entity);
         }
@@ -75,11 +73,11 @@ public class CraftEngineFurniture {
         return false;
     }
 
-    public boolean setColorFromHex(Entity entity, String hex) {
+    public boolean setColorFromHex(org.bukkit.entity.Entity entity, String hex) {
         return setColor(entity, CraftEngine.util().fromHex(hex));
     }
 
-    public boolean setColorFromRGB(Entity entity, String rgb) {
+    public boolean setColorFromRGB(org.bukkit.entity.Entity entity, String rgb) {
         return setColor(entity, CraftEngine.util().fromRGB(rgb));
     }
 }

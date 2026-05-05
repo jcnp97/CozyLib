@@ -1,8 +1,8 @@
 package net.cozyvanilla.cozylib.modules.mysql.abstracts;
 
 import net.cozyvanilla.cozylib.Logger;
-import net.cozyvanilla.cozylib.modules.mysql.MySQLDatabaseAPI;
-import net.cozyvanilla.cozylib.utilities.paper.FutureUtils;
+import net.cozyvanilla.cozylib.runtime.MySQLConnection;
+import net.cozyvanilla.cozylib.util.paper.FutureUtils;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,7 +30,7 @@ public abstract class AbstractMySQL {
 
     // ------------ usable methods ------------
     protected final Connection getConnection() throws SQLException {
-        return MySQLDatabaseAPI.getConnection();
+        return MySQLConnection.getConnection();
     }
 
     // ------------ mandatory methods ------------

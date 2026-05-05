@@ -2,6 +2,7 @@ package net.cozyvanilla.cozylib;
 
 import net.cozyvanilla.cozylib.integrations.Integrations;
 import net.cozyvanilla.cozylib.modules.Modules;
+import net.cozyvanilla.cozylib.runtime.MySQLConnection;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -10,6 +11,8 @@ public final class CozyLib extends JavaPlugin {
     private static CozyLib instance;
     private static File directory;
 
+    private Config config;
+    private MySQLConnection database;
     private Logger logger;
     private Modules modules;
     private Integrations integrations;
@@ -19,8 +22,9 @@ public final class CozyLib extends JavaPlugin {
         instance = this;
         directory = getDataFolder();
 
-        new Config(this);
+        this.config = new Config(this);
         this.logger = new Logger(this);
+        this.database = new MySQLConnection(this);
         this.modules = new Modules(this);
         this.integrations = new Integrations(this);
     }
