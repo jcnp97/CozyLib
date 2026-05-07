@@ -1,100 +1,51 @@
 package net.cozyvanilla.cozylib.integrations.economy;
 
-import net.cozyvanilla.cozylib.Logger;
-import net.cozyvanilla.cozylib.common.enums.PluginState;
-import net.cozyvanilla.cozylib.integrations.Integration;
-import net.cozyvanilla.cozylib.util.bukkit.PluginUtils;
+import net.cozyvanilla.cozylib.common.interfaces.ExcellentEconomyAPI;
+import net.cozyvanilla.cozylib.integrations.AbstractIntegration;
 import org.bukkit.Bukkit;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
-import su.nightexpress.excellenteconomy.api.ExcellentEconomyAPI;
 
-import java.io.File;
+public final class ExcellentEconomy extends AbstractIntegration implements ExcellentEconomyAPI {
 
-public final class ExcellentEconomy implements Integration {
+    private su.nightexpress.excellenteconomy.api.ExcellentEconomyAPI api;
+    private ExcellentEconomyGet get;
+    private ExcellentEconomyDeposit deposit;
+    private ExcellentEconomyWithdraw withdraw;
 
-    // static
-    private static final String pluginName = "ExcellentEconomy";
-    private static PluginState state;
-    private static File directory;
-
-    private static ExcellentEconomyGet get;
-    private static ExcellentEconomyDeposit deposit;
-    private static ExcellentEconomyWithdraw withdraw;
-
-    public ExcellentEconomy() {}
-
-    @Override
-    public String getName() {
-        return pluginName;
+    public ExcellentEconomy() {
+        super("ExcellentEconomy");
     }
 
     @Override
     public void enable() {
-        Plugin plugin = PluginUtils.getPlugin(getName());
-        if (plugin == null) {
-            Logger.warning(pluginName + " not found! Disabling integration..");
-            return;
-        }
-
-        state = PluginState.INSTALLED_NOT_LOADED;
-        directory = PluginUtils.getDirectory(getName());
-    }
-
-    @Override
-    public void disable() {
-        state = PluginState.INSTALLED_NOT_LOADED;
-    }
-
-    @Override
-    public void load() {
-        if (state == PluginState.LOADED) return;
-
-        RegisteredServiceProvider<ExcellentEconomyAPI> provider = Bukkit.getServer().getServicesManager().getRegistration(ExcellentEconomyAPI.class);
+        RegisteredServiceProvider<su.nightexpress.excellenteconomy.api.ExcellentEconomyAPI> provider = Bukkit.getServer().getServicesManager().getRegistration(su.nightexpress.excellenteconomy.api.ExcellentEconomyAPI.class);
         if (provider != null) {
-            ExcellentEconomyAPI api = provider.getProvider();
-            // load APIs
-            get = new ExcellentEconomyGet(api);
-            deposit = new ExcellentEconomyDeposit(api);
-            withdraw = new ExcellentEconomyWithdraw(api);
-
-            // change into load state
-            state = PluginState.LOADED;
+            api = provider.getProvider();
+            ready();
         }
     }
 
-    private static void require() {
-        switch (state) {
-            case LOADED -> {
-                return;
-            }
-            case NOT_INSTALLED -> {
-                throw new IllegalStateException(
-                    pluginName + " integration is unavailable because it is not installed or not enabled."
-            );
-            }
-            case INSTALLED_NOT_LOADED -> throw new IllegalStateException(
-                    pluginName + " integration is unavailable because it has not finished initializing yet."
-            );
-        }
+    @Override
+    protected void loadAPIs() {
+        get = new ExcellentEconomyGet(api);
+        deposit = new ExcellentEconomyDeposit(api);
+        withdraw = new ExcellentEconomyWithdraw(api);
     }
 
-    // public
-    public static File getDirectory() {
-        return directory;
-    }
-
-    public static ExcellentEconomyGet get() {
+    @Override
+    public ExcellentEconomyGet get() {
         require();
         return get;
     }
 
-    public static ExcellentEconomyWithdraw withdraw() {
+    @Override
+    public ExcellentEconomyWithdraw withdraw() {
         require();
         return withdraw;
     }
 
-    public static ExcellentEconomyDeposit deposit() {
+    @Override
+    public ExcellentEconomyDeposit deposit() {
         require();
         return deposit;
     }

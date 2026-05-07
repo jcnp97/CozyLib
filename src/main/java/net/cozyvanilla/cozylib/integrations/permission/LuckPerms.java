@@ -1,84 +1,35 @@
 package net.cozyvanilla.cozylib.integrations.permission;
 
-import net.cozyvanilla.cozylib.Logger;
-import net.cozyvanilla.cozylib.common.enums.PluginState;
-import net.cozyvanilla.cozylib.integrations.Integration;
-import net.cozyvanilla.cozylib.util.bukkit.PluginUtils;
+import net.cozyvanilla.cozylib.common.interfaces.LuckPermsAPI;
+import net.cozyvanilla.cozylib.integrations.AbstractIntegration;
 import org.bukkit.Bukkit;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
-import java.io.File;
+public final class LuckPerms extends AbstractIntegration implements LuckPermsAPI {
 
-public final class LuckPerms implements Integration {
+    private net.luckperms.api.LuckPerms api;
+    private LuckPermsGet get;
 
-    // static
-    private static final String pluginName = "LuckPerms";
-    private static PluginState state;
-    private static File directory;
-
-    private static LuckPermsGet get;
-
-    public LuckPerms() {}
-
-    @Override
-    public String getName() {
-        return pluginName;
+    public LuckPerms() {
+        super("LuckPerms");
     }
 
     @Override
     public void enable() {
-        Plugin plugin = PluginUtils.getPlugin(getName());
-        if (plugin == null) {
-            Logger.warning(pluginName + " not found! Disabling integration..");
-            return;
-        }
-
-        state = PluginState.INSTALLED_NOT_LOADED;
-        directory = PluginUtils.getDirectory(getName());
-    }
-
-    @Override
-    public void disable() {
-        state = PluginState.INSTALLED_NOT_LOADED;
-    }
-
-    @Override
-    public void load() {
-        if (state == PluginState.LOADED) return;
-
         RegisteredServiceProvider<net.luckperms.api.LuckPerms> provider = Bukkit.getServicesManager().getRegistration(net.luckperms.api.LuckPerms.class);
         if (provider != null) {
-            net.luckperms.api.LuckPerms api = provider.getProvider();
-
-            // load APIs
-            get = new LuckPermsGet(api);
-
-            // change into load state
-            state = PluginState.LOADED;
+            api = provider.getProvider();
+            ready();
         }
     }
 
-    private static void require() {
-        switch (state) {
-            case LOADED -> {
-                return;
-            }
-            case NOT_INSTALLED -> throw new IllegalStateException(
-                    pluginName + " integration is unavailable because it is not installed or not enabled."
-            );
-            case INSTALLED_NOT_LOADED -> throw new IllegalStateException(
-                    pluginName + " integration is unavailable because it has not finished initializing yet."
-            );
-        }
+    @Override
+    protected void loadAPIs() {
+        get = new LuckPermsGet(api);
     }
 
-    // public
-    public static File getDirectory() {
-        return directory;
-    }
-
-    public static LuckPermsGet get() {
+    @Override
+    public LuckPermsGet get() {
         require();
         return get;
     }

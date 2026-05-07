@@ -1,6 +1,7 @@
 package net.cozyvanilla.cozylib.integrations.craftengine;
 
-import net.cozyvanilla.cozylib.Logger;
+import net.cozyvanilla.cozylib.integrations.Integrations;
+import net.cozyvanilla.cozylib.runtime.Logger;
 import net.cozyvanilla.cozylib.util.bukkit.EntityUtils;
 import net.momirealms.craftengine.bukkit.entity.furniture.BukkitFurniture;
 import net.momirealms.craftengine.core.entity.furniture.*;
@@ -74,10 +75,10 @@ public class CraftEngineFurniture {
     }
 
     public boolean setColorFromHex(org.bukkit.entity.Entity entity, String hex) {
-        return setColor(entity, CraftEngine.util().fromHex(hex));
+        return setColor(entity, Integrations.get().craftEngine().util().fromHex(hex));
     }
 
     public boolean setColorFromRGB(org.bukkit.entity.Entity entity, String rgb) {
-        return setColor(entity, CraftEngine.util().fromRGB(rgb));
+        return setColor(entity, Integrations.get().craftEngine().util().fromRGB(rgb));
     }
 }

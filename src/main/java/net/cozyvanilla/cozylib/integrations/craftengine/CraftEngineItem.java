@@ -1,6 +1,7 @@
 package net.cozyvanilla.cozylib.integrations.craftengine;
 
-import net.cozyvanilla.cozylib.Logger;
+import net.cozyvanilla.cozylib.integrations.Integrations;
+import net.cozyvanilla.cozylib.runtime.Logger;
 import net.momirealms.craftengine.bukkit.api.CraftEngineItems;
 import net.momirealms.craftengine.bukkit.item.BukkitItemDefinition;
 import net.momirealms.craftengine.core.item.Item;
@@ -36,12 +37,12 @@ public class CraftEngineItem {
     // public API
     @Nullable
     public ItemStack getItemStack(String namespace, String itemName) {
-        return getItemStack(CraftEngine.util().toKey(namespace, itemName));
+        return getItemStack(Integrations.get().craftEngine().util().toKey(namespace, itemName));
     }
 
     @Nullable
     public ItemStack getItemStack(String id) {
-        return getItemStack(CraftEngine.util().toKey(id));
+        return getItemStack(Integrations.get().craftEngine().util().toKey(id));
     }
 
     @Nullable
@@ -56,10 +57,10 @@ public class CraftEngineItem {
     }
 
     public Item setColorFromHex(Item item, String hex) {
-        return item.dyedColor(CraftEngine.util().fromHex(hex));
+        return item.dyedColor(Integrations.get().craftEngine().util().fromHex(hex));
     }
 
     public Item setColorFromRGB(Item item, String rgb) {
-        return item.dyedColor(CraftEngine.util().fromRGB(rgb));
+        return item.dyedColor(Integrations.get().craftEngine().util().fromRGB(rgb));
     }
 }

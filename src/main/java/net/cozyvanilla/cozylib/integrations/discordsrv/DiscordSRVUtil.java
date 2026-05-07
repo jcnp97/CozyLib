@@ -4,7 +4,7 @@ import github.scarsz.discordsrv.DiscordSRV;
 import github.scarsz.discordsrv.dependencies.jda.api.EmbedBuilder;
 import github.scarsz.discordsrv.dependencies.jda.api.JDA;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
-import net.cozyvanilla.cozylib.Logger;
+import net.cozyvanilla.cozylib.runtime.Logger;
 
 import java.awt.*;
 import java.time.Instant;
